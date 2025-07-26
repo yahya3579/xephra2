@@ -1,0 +1,144 @@
+.userProfile {
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #e3e3e3;
+    border-radius: 12px;
+  }
+  
+  .profileImageContainer {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .profileImageWrapper {
+    position: relative;
+  }
+  
+  .avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #B6A99A;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cameraIconWrapper {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .cameraIconWrapper:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .cameraIcon {
+    color: #fff;
+    font-size: 18px;
+  }
+  
+  .profileForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media (max-width: 600px) {
+    .profileForm {
+      margin-left: 8px;
+    }
+  }
+  
+  label {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #ffffff;
+  }
+  
+  .userProfileInput,
+.userProfiletextarea {
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  /* border-radius: 8px;
+  border: 1px solid #b3b3b3; */
+  background-color: #331A1FC9;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Ensure class-based styles take precedence over generic ones */
+.userProfileForm .userProfileInput,
+.userProfileForm .userProfiletextarea {
+  color: white !important;
+  background-color: #1313138d !important;
+  /* border: 1px solid #b3b3b3 !important; */
+}
+  
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  .uploadBtn {
+    padding: 16px 10px;
+    color: #C9B796;
+    font-weight: bold;
+    margin-left: 16px;
+    border: solid #fff 1px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .uploadBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .uploadBtn:active {
+    transform: scale(0.98);
+  }
+  
+  .userProfile h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: #B6A99A;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+    /* Error message styling */
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -8px;
+  margin-bottom: 10px;
+}
+
+/* Highlight the input field with an error */
+.input-error {
+  border: 2px solid red;
+}
+
+
+.message {
+  margin-left: 20px;
+  font-weight: bold;
+  color: #e0bf7c;
+}
