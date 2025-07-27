@@ -1,4 +1,4 @@
-import { React, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Navbar from "../components/HomePageComponents/Navbar";
 import Herosection from "../components/HomePageComponents/Herosection";
 import GamesCards from "../components/HomePageComponents/GamesCards";
