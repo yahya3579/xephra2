@@ -286,7 +286,7 @@ exports.resendVerificationEmail = async (req, res) => {
       );
 
       // Create reset URL
-      const resetUrl = `${req.protocol}://localhost:3000/reset/${resetToken}`;
+      const resetUrl = `${req.protocol}://xephra.net/reset/${resetToken}`;
 
       // send email
       const transporter = nodemailer.createTransport({
