@@ -383,19 +383,19 @@ Address:Al Ghurair Giga Westria road, Plaza No #34 2nd Floor, DHA phase 2, Islam
 
             {/* Social Media */}
              <div className="flex space-x-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href="https://twitch.tv" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
                 <Twitch className="w-5 h-5" />
               </a>
             </div>
@@ -493,11 +493,11 @@ Address:Al Ghurair Giga Westria road, Plaza No #34 2nd Floor, DHA phase 2, Islam
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="w-4 h-4 text-[#D19F43]" />
-                <span className="text-gray-300 text-sm">support@xephra.com</span>
+                <span className="text-gray-300 text-sm">officialxephra@gmail.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="w-4 h-4 text-[#D19F43]" />
-                <span className="text-gray-300 text-sm">(+92)3000692222</span>
+                <span className="text-gray-300 text-sm">(+92) 339 6969698</span>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="w-4 h-4 text-[#D19F43] mt-0.5" />
