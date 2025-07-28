@@ -513,7 +513,7 @@ Address:Al Ghurair Giga Westria road, Plaza No #34 2nd Floor, DHA phase 2, Islam
         <div className="border-t border-gray-700 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © 2025 XEPHRA. All rights reserved. Developed with ❤️ for gamers.
+              © 2025 XEPHRA. All rights reserved. Developed by TechxServe for gamers.
             </div>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-xs">
               <button 
