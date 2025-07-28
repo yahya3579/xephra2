@@ -221,7 +221,6 @@
 
 // export default HomeV2;
 
-
 // import React, { useState } from "react";
 // import { Search, User, Bell } from "lucide-react";
 // import logo from "../assets/xephra logo-01.png";
@@ -250,20 +249,20 @@
 //   const handleNavClick = (item) => {
 //     setActiveNav(item);
 //     setIsMenuOpen(false); // Close mobile menu if open
-    
+
 //     // Scroll to respective sections
 //     const sectionMap = {
 //       "Home": "hero-section",
-//       "Games": "games-section", 
+//       "Games": "games-section",
 //       "Tournaments": "tournaments-section",
 //       "Prices": "prices-section"
 //     };
-    
+
 //     const sectionId = sectionMap[item];
 //     if (sectionId) {
 //       const element = document.getElementById(sectionId);
 //       if (element) {
-//         element.scrollIntoView({ 
+//         element.scrollIntoView({
 //           behavior: 'smooth',
 //           block: 'start'
 //         });
@@ -313,10 +312,10 @@
 //             to="/"
 //             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
 //           >
-//             <img 
-//               src={logo} 
-//               alt="XEPHRA Logo" 
-//               className="h-8 w-24 sm:h-12 sm:w-32" 
+//             <img
+//               src={logo}
+//               alt="XEPHRA Logo"
+//               className="h-8 w-24 sm:h-12 sm:w-32"
 //             />
 //           </Link>
 
@@ -463,11 +462,11 @@
 //       <div id="games-section">
 //         <GamesCardsV2 dark={dark} />
 //       </div>
-      
+
 //       <div id="tournaments-section">
 //         <UpcomingTournaments dark={dark} />
 //       </div>
-      
+
 //       <div id="prices-section">
 //         <PricesV2 dark={dark} />
 //       </div>
@@ -478,8 +477,6 @@
 // };
 
 // export default HomeV2;
-
-
 
 import React, { useState } from "react";
 import { Search, User, Bell } from "lucide-react";
@@ -492,6 +489,10 @@ import UpcomingTournaments from "../components/HomePageComponents/UpcomingTourna
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
 import Bg1 from "../assets/homepage/homebg1.png";
+import Bg2 from "../assets/homepage/homebg2.png";
+import Bg3 from "../assets/homepage/homebg3.png";
+import Bg4 from "../assets/homepage/homebg4.jpg";
+import Bg5 from "../assets/homepage/homebg5.jpg";
 
 const HomeV2 = () => {
   const [activeNav, setActiveNav] = useState("Home");
@@ -510,23 +511,23 @@ const HomeV2 = () => {
   const handleNavClick = (item) => {
     setActiveNav(item);
     setIsMenuOpen(false); // Close mobile menu if open
-    
+
     // Scroll to respective sections
     const sectionMap = {
-      "Home": "hero-section",
-      "Games": "games-section", 
-      "Tournaments": "tournaments-section",
-      "Prices": "prices-section",
-      "Footer": "footer-section"
+      Home: "hero-section",
+      Games: "games-section",
+      Tournaments: "tournaments-section",
+      Prices: "prices-section",
+      Footer: "footer-section",
     };
-    
+
     const sectionId = sectionMap[item];
     if (sectionId) {
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }
     }
@@ -535,9 +536,7 @@ const HomeV2 = () => {
   const navItems = ["Home", "Games", "Tournaments", "Prices"];
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden" style={{backgroundImage: `url(${Bg1})`,backgroundSize: 'contain'
-    , // Prevents stretching
-      backgroundPosition: 'center center'}}>
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Background with character silhouettes */}
       <div className="absolute inset-0">
         {/* Main background gradient */}
@@ -570,16 +569,16 @@ const HomeV2 = () => {
 
       {/* Header - Responsive for screens below 450px */}
       <header className="relative z-20 px-4 sm:px-8 py-2 sm:py-4 bg-[#292622c4] backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between" >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo (Left) - Smaller on mobile */}
           <Link
             to="/"
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
-            <img 
-              src={logo} 
-              alt="XEPHRA Logo" 
-              className="h-8 w-24 sm:h-12 sm:w-40" 
+            <img
+              src={logo}
+              alt="XEPHRA Logo"
+              className="h-8 w-24 sm:h-12 sm:w-40"
             />
           </Link>
 
@@ -693,7 +692,16 @@ const HomeV2 = () => {
       )}
 
       {/* Hero Section */}
-      <section id="hero-section" className="relative z-10 px-4 sm:px-8 pt-8 sm:pt-16 pb-8">
+      <section
+        id="hero-section"
+        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-4 sm:px-8 pt-8 md:pt-20 sm:pt-16 pb-8 md:pb-20"
+        style={{
+          backgroundImage: `url(${Bg1})`,
+        }}
+      >
+        {/* Gradient Overlay (same as page background) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-orange-600/20 z-0"></div>
+
         <div className="max-w-6xl">
           <div className="mb-4 sm:mb-6">
             <span className="font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-4 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
@@ -722,19 +730,49 @@ const HomeV2 = () => {
         </div>
       </section>
 
-      {/* Add IDs to sections for scrolling */}
-      <div id="games-section">
-        <GamesCardsV2 dark={dark} />
+      <div
+        id="games-section"
+        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
+        style={{
+          backgroundImage: `url(${Bg4})`,
+        }}
+      >
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-orange-600/20 z-0"></div> */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
+
+        <div className="relative z-10">
+          <GamesCardsV2 dark={dark} />
+        </div>
       </div>
-      
-      <div id="tournaments-section">
-        <UpcomingTournaments dark={dark} />
+
+      <div
+        id="tournaments-section"
+        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
+        style={{
+          backgroundImage: `url(${Bg5})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
+
+        <div className="relative z-10">
+          <UpcomingTournaments dark={dark} />
+        </div>
       </div>
-      
-      <div id="prices-section">
-        <PricesV2 dark={dark} />
+
+      <div
+        id="prices-section"
+        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
+        style={{
+          backgroundImage: `url(${Bg2})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
+
+        <div className="relative z-10">
+          <PricesV2 dark={dark} />
+        </div>
       </div>
-      
+
       {/* Footer */}
       <div id="footer-section">
         <Footer handleNavClick={handleNavClick} />

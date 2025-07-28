@@ -77,8 +77,8 @@ const UpcomingTournaments = ({ dark }) => {
   ];
 
   return (
-    <div className={`m-4 sm:m-8 lg:m-16 p-4 sm:p-6 lg:p-8 rounded shadow-2xl shadow-gray-950 pb-8 sm:pb-10 backdrop-blur-sm ${
-              dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#2321225d]"
+    <div className={`m-4 sm:m-8 lg:m-16 p-4 sm:p-6 lg:p-8 rounded-md shadow-2xl shadow-gray-950 pb-8 sm:pb-10 backdrop-blur-sm ${
+              dark ? "bg-[#854951] bg-opacity-[0.4]" : "bg-[#2321225d]"
             }`}>
       {/* Main container */}
       <div className="container mx-auto px-4 sm:px-2 lg:px-8 py-8 sm:py-12 lg:py-16">
