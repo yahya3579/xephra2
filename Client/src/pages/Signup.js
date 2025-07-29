@@ -200,7 +200,7 @@ const Signup = () => {
   }, [token, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = "https://api.xephra.net/auth/google";
   };
 
   if (loading) return <Loading />;

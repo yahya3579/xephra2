@@ -498,7 +498,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://xephra.net/auth/google";
+    window.location.href = "https://api.xephra.net/auth/google";
   };
 
   if (loading) {
