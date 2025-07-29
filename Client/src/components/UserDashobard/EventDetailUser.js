@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getEventById, joinEvent } from "../../redux/features/eventsSlice";
+import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import Loading from "../../utils/Loading/Loading";
+import { useState } from "react";
 
 const EventDetailUser = () => {
   const dispatch = useDispatch();
@@ -11,10 +13,20 @@ const EventDetailUser = () => {
   const { event, loading, error, message } = useSelector(
     (state) => state.events
   );
+  const { subscriptionStatus } = useSelector((state) => state.payment);
+  const [showPopup, setShowPopup] = useState(false);
+  const userId = JSON.parse(localStorage.getItem("user")).UserId;
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Check subscription status when component mounts
+    useEffect(() => {
+      if (userId) {
+        dispatch(getSubscriptionStatus(userId));
+      }
+    }, [dispatch, userId]);
 
   useEffect(() => {
     if (eventId) {
@@ -22,15 +34,26 @@ const EventDetailUser = () => {
     }
   }, [dispatch, eventId]);
 
-  const userId = JSON.parse(localStorage.getItem("user")).UserId;
+  
   const handleJoin = (_id) => {
     const eventId = _id;
     if (!userId) {
       alert("User is not logged in");
       return;
     }
+
+    // Check if subscription is active
+    if (!subscriptionStatus?.isActive) {
+      setShowPopup(true);
+      return;
+    }
+
     dispatch(joinEvent({ userId, eventId }));
     alert("joined Successfully");
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
   };
 
   if (!event) {
@@ -84,15 +107,54 @@ const EventDetailUser = () => {
             >
               Back to Events
             </Link>
-            <button
-              className="bg-[#8f404f] text-white px-6 py-3 rounded-md hover:bg-[#a34c5a] transition"
+             <button
+              disabled={loading || subscriptionStatus?.loading}
               onClick={() => handleJoin(event?._id)}
+              className="bg-[#8f404f] text-white px-6 py-3 rounded-md hover:bg-[#a34c5a] transition"
             >
-              Join Now
+              {loading ? "Joining..." : subscriptionStatus?.loading ? "Checking..." : "Join Now"}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Subscription Popup */}
+            {showPopup && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-[#000000] border border-[#D19F43] rounded-lg p-6 max-w-md mx-4 relative">
+                  <button
+                    onClick={closePopup}
+                    className="absolute top-2 right-2 text-[#C9B796] hover:text-[#D19F43] text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold text-[#D19F43] mb-4">
+                      Subscription Required
+                    </h3>
+                    <p className="text-[#C9B796] mb-6">
+                      You need to activate your subscription to join events.
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={closePopup}
+                        className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                      >
+                        Cancel
+                      </button>
+                      <Link to="/paymentportal">
+                        <button
+                          onClick={closePopup}
+                          className="px-6 py-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black rounded-md hover:opacity-90 transition"
+                        >
+                          Activate Subscription
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
     </div>
   );
 };

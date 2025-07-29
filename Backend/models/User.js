@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema(
     userId: { type: String, unique: true, default: () => `user_${Date.now()}` },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     isSuspended: { type: Boolean, default: false },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
     // Add email verification fields
     isVerified: {
       type: Boolean,

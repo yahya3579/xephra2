@@ -305,17 +305,17 @@ updatePaymentById: async (req, res) => {
       const planMap = {
         weekly: {
           planName: "Weekly Plan",
-          planPrice: "PKR 350",
+          planPrice: "PKR 749",
           planDuration: "1 Week",
         },
         monthly: {
           planName: "Monthly Plan",
-          planPrice: "PKR 999",
+          planPrice: "PKR 1,499",
           planDuration: "1 Month",
         },
         yearly: {
           planName: "Yearly Plan",
-          planPrice: "PKR 8,999",
+          planPrice: "PKR 3,999",
           planDuration: "12 Months",
         },
       };

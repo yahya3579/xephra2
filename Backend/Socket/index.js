@@ -9,6 +9,7 @@ const AdminMessageModel = require("../models/AdminMessage");
       // origin: "https://xephra.net", // Update with your frontend URL
         // origin: "https://xephra-two.vercel.app",
         origin: "http://xephra.net",
+        // origin: "http://localhost:3000",
         methods: ["GET", "POST"],
         credentials: true
       },

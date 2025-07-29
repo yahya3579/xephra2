@@ -257,59 +257,52 @@ exports.resendVerificationEmail = async (req, res) => {
 
 
   exports.forgot = async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Email not found" });
     }
 
-    try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ error: "Email not found" });
-      }
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const tokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
 
-      const resetToken = crypto.randomBytes(20).toString("hex");
-      const hashedToken = crypto
-        .createHash("sha256")
-        .update(resetToken)
-        .digest("hex");
-      const tokenExpiry = Date.now() + 15 * 60 * 1000;
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = tokenExpiry;
+    await user.save();
 
-      await User.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            resetPasswordToken: hashedToken,
-            resetPasswordExpires: tokenExpiry,
-          },
-        }
-      );
+    // const resetUrl = `http://localhost:3000/reset/${resetToken}`;
+    // Or for production:
+    const resetUrl = `${req.protocol}://${req.get("host")}/reset/${resetToken}`;
 
-      // Create reset URL
-      const resetUrl = `${req.protocol}://xephra.net/reset/${resetToken}`;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-      // send email
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset Xephra",
+      text: `You requested a password reset. Click the link below to reset your password:\n\n${resetUrl}`,
+    };
 
-      const mailoptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: "Password Reset Xephra",
-        text: `You are receiving this email because you requested a password reset. Click this link to reset your password: ${resetUrl}`,
-      };
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Password reset email sent" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error sending password reset email." });
+  }
+};
 
-      await transporter.sendMail(mailoptions);
-      res.status(200).json({ message: "Password reset email sent" });
-    } catch (error) {
-      res.status(500).json({ message: "Error sending password reset email." });
-    }
-  };
 
 exports.reset = async (req, res) => {
   const { newPassword } = req.body;
@@ -327,7 +320,7 @@ exports.reset = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token." });
+      return res.status(400).json({ error: "Invalid or expired token." });
     }
     user.password = newPassword;
     user.resetPasswordToken = undefined;

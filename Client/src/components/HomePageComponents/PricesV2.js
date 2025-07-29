@@ -5,7 +5,7 @@ export default function PricesV2({dark}) {
   const plans = [
     {
       name: "WEEKLY PLAN",
-      price: "PKR 350",
+      price: "PKR 749",
       period: "1 Week",
       features: [
         "Perfect For Casual Gamers who want to join the fun and compete",
@@ -16,7 +16,7 @@ export default function PricesV2({dark}) {
     },
     {
       name: "MONTHLY PLAN",
-      price: "PKR 999",
+      price: "PKR 1,499",
       period: "1 Month",
       features: [
         "Perfect for Regular Gamers who want consistent access",
@@ -27,7 +27,7 @@ export default function PricesV2({dark}) {
     },
     {
       name: "YEARLY PLAN", 
-      price: "PKR 8,999",
+      price: "PKR 3,999",
       period: "12 Months",
       features: [
         "Perfect For Serious Gamers who want maximum value",

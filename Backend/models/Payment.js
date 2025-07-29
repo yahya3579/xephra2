@@ -23,7 +23,7 @@ const SubscriptionPlanSchema = new Schema({
     type: String,
     required: [true, 'Plan price is required'],
     enum: {
-      values: ['PKR 350', 'PKR 999', 'PKR 8,999'],
+      values: ['PKR 749', 'PKR 1,499', 'PKR 3,999'],
       message: 'Invalid plan price'
     }
   },
@@ -251,9 +251,9 @@ PaymentSchema.index({
 // Virtual for payment amount as number
 PaymentSchema.virtual('paymentAmount').get(function() {
   const priceMap = {
-    'PKR 350': 350,
-    'PKR 999': 999,
-    'PKR 8,999': 8999
+    'PKR 749': 749,
+    'PKR 1,499': 1499,
+    'PKR 3,999': 3999
   };
   return priceMap[this.selectedPlan.planPrice] || 0;
 });

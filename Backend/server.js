@@ -28,6 +28,7 @@ startSubscriptionCron();
 const corsOptions = {
   // origin: "https://xephra.vercel.app",
   origin: "https://xephra.net",
+  // origin: "http://localhost:3000",
   // origin: "https://xephra-two.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -39,6 +40,7 @@ app.use(cors(corsOptions));
 app.options("*", (req, res) => {
   // res.header("Access-Control-Allow-Origin", "https://xephra.vercel.app");
   res.header("Access-Control-Allow-Origin", "https://xephra.net");
+  // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   // res.header("Access-Control-Allow-Origin", "https://xephra-two.vercel.app");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");

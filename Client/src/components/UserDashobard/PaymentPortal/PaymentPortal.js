@@ -57,17 +57,17 @@ const UserPaymentPortal = () => {
   }, [dispatch]);
 
   const subscriptionPlans = [
-    { id: "weekly", name: "Weekly Plan", price: "PKR 350", duration: "1 Week" },
+    { id: "weekly", name: "Weekly Plan", price: "PKR 749", duration: "1 Week" },
     {
       id: "monthly",
       name: "Monthly Plan",
-      price: "PKR 999",
+      price: "PKR 1,499",
       duration: "1 Month",
     },
     {
       id: "yearly",
       name: "Yearly Plan",
-      price: "PKR 8,999",
+      price: "PKR 3,999",
       duration: "12 Months",
     },
   ];

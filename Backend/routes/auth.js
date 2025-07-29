@@ -25,7 +25,7 @@ router.get(
   
       // Redirect to frontend with user data
       res.redirect(
-        `http://localhost:3000/google-success?data=${encodeURIComponent(
+        `https://xephra.net/google-success?data=${encodeURIComponent(
           JSON.stringify(userData)
         )}`
       );

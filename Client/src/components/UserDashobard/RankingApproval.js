@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { fetchHostedTournaments } from "../../redux/features/eventsSlice";
 import {
   postRankingApproval,
   fetchUserSubmissions,
   deleteUserSubmission,
 } from "../../redux/features/rankingSlice";
+import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../utils/Loading/Loading";
 
@@ -12,9 +14,18 @@ const RankingApproval = ({ dark }) => {
   const dispatch = useDispatch();
   const { loading, hostedEvents } = useSelector((state) => state.events);
   const { data, error, submissions } = useSelector((state) => state.ranking);
+  const { subscriptionStatus } = useSelector((state) => state.payment);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user.UserId;
+
+  // Check subscription status when component mounts
+  useEffect(() => {
+    if (userId) {
+      dispatch(getSubscriptionStatus(userId));
+    }
+  }, [dispatch, userId]);
+
   useEffect(() => {
     dispatch(fetchHostedTournaments());
   }, [dispatch]);
@@ -52,6 +63,12 @@ const RankingApproval = ({ dark }) => {
 
   // Handle submission
   const handleSubmit = () => {
+    // Check subscription before allowing submission
+    if (!subscriptionStatus?.isActive) {
+      alert("You need an active subscription to submit game entries.");
+      return;
+    }
+
     setGame((prevGame) => ({
       ...prevGame,
       status: "Pending",
@@ -68,13 +85,80 @@ const RankingApproval = ({ dark }) => {
       screenshot: null,
     });
   };
+
   const handleDelete = (userId, eventId) => {
     dispatch(deleteUserSubmission({ userId, eventId }));
   };
 
-  if (loading) {
+  if (loading || subscriptionStatus?.loading) {
     return <Loading />;
   }
+
+  // Show subscription restriction message if not subscribed
+  if (!subscriptionStatus?.isActive) {
+    return (
+      <div className={`rounded-lg p-6 mx-auto text-center min-h-full shadow-2xl shadow-gray-950 backdrop-blur-sm ${
+          dark
+            ? "bg-[#492f3418] bg-opacity-[.06]":"bg-[#492f3418] bg-opacity-[.06]"}`}>
+        <h1
+          className={`text-[2.5rem] sm:text-2xl md:text-[2.5rem] lg:text-5xl font-semibold mb-6 font-[Montserrat] drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent ${
+            dark ? "" : "text-[#232122]"
+          }`}
+        >
+          User Game Entry
+        </h1>
+        
+        <div className={`${
+                    dark ? "bg-[#0000007D]" : "bg-[#69363F66]"
+                  } rounded-lg p-8 z-50 backdrop-blur-lg mx-auto max-w-md`}>
+          <div className="text-center">
+            <div className="mb-6">
+              <svg 
+                className="mx-auto h-16 w-16 text-[#D19F43] mb-4" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
+                />
+              </svg>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-[#D19F43] mb-4">
+              Subscription Required
+            </h3>
+            
+            <p className="text-[#C9B796] mb-6 text-lg leading-relaxed">
+              You need an active subscription to submit game entries and participate in tournaments.
+            </p>
+            
+            <div className="space-y-4">
+              <p className="text-[#C9B796] text-sm">
+                Unlock access to:
+              </p>
+              <ul className="text-[#C9B796] text-sm space-y-2 mb-6">
+                <li>• Submit game rankings</li>
+                <li>• Join tournaments</li>
+                <li>• View detailed statistics</li>
+                <li>• Access premium features</li>
+              </ul>
+              
+              <Link to="/paymentportal">
+                <button className="w-full px-8 py-3 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black font-semibold rounded-md hover:opacity-90 transition duration-300 transform hover:scale-105">
+                  Activate Subscription
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   console.log("game", game);
   return (
     <div className={`rounded-lg p-6 mx-auto text-center min-h-full shadow-2xl shadow-gray-950 backdrop-blur-sm  ${
@@ -250,7 +334,7 @@ const RankingApproval = ({ dark }) => {
               {/* Screenshot on Top */}
               {submission.screenshot && (
                 <img
-                  src={`http://localhost:5000/${submission.screenshot}`}
+                  src={`${process.env.REACT_APP_BACKEND}/${submission.screenshot}`}
                   alt="Submission Screenshot"
                   className="w-full h-36 object-cover rounded-t-2xl"
                 />
