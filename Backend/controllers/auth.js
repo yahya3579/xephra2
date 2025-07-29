@@ -278,7 +278,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
     // const resetUrl = `http://localhost:3000/reset/${resetToken}`;
     // Or for production:
-    const resetUrl = `${req.protocol}://${req.get("host")}/reset/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
