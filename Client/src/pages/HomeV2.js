@@ -8,11 +8,11 @@ import GamesCardsV2 from "../components/HomePageComponents/GamesCardsV2";
 import UpcomingTournaments from "../components/HomePageComponents/UpcomingTournaments";
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
-import Bg1 from "../assets/homepage/homebg1.png";
-import Bg2 from "../assets/homepage/homebg2.png";
-import Bg3 from "../assets/homepage/homebg3.png";
-import Bg4 from "../assets/homepage/homebg4.jpg";
-import Bg5 from "../assets/homepage/homebg5.jpg";
+import Bg1 from "../assets/homepage/homebg1.webp";
+import Bg2 from "../assets/homepage/homebg2.webp";
+import Bg3 from "../assets/homepage/homebg3.webp";
+import Bg4 from "../assets/homepage/homebg4.webp";
+import Bg5 from "../assets/homepage/homebg5.webp";
 
 const HomeV2 = () => {
   const [activeNav, setActiveNav] = useState("Home");

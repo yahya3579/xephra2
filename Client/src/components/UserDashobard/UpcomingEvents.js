@@ -70,7 +70,7 @@ const TournamentCard = ({
               <span className=" bg-[#302A27] px-5">{date}</span> • <span className=" bg-[#302A27] px-5">{time}</span>
             </p>
             <div>
-              <span className="text-xl font-bold text-[#D4AD66]">PKR: {prizePool}</span>
+              <span className="text-xl font-bold text-[#D4AD66]">Prize Pool: PKR {prizePool}</span>
             </div>
           </Link> 
           <div className="flex justify-center">

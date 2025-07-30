@@ -14,20 +14,20 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile } from "../../redux/features/userSlice";
 import CompletedEvents from "../../components/UserDashobard/CompletedEvents";
-import bgLight from "../../assets/background/Dashboard.png";
-import bgDark from "../../assets/background/dashboard-dark-mode.png";
-import bgUpcomingLight from "../../assets/background/upcoming-events-light.png";
-import bgUpcomingDark from "../../assets/background/upcoming-events-dark.png";
-import bgRegisteredLight from "../../assets/background/registered-events-light.png";
-import bgRegisteredDark from "../../assets/background/registered-events-dark.png";
-import bgRankingBoardLight from "../../assets/background/ranking-board-light.png";
-import bgRankingBoardDark from "../../assets/background/ranking-board-dark.png";
-import bgCompletedEventsLight from "../../assets/background/completed-events-light.png";
-import bgCompletedEventsDark from "../../assets/background/completed-events-dark.png";
-import bgRankingApprovalLight from "../../assets/background/ranking-approval-light.png";
-import bgRankingApprovalDark from "../../assets/background/ranking-approval-dark.png";
-import bgProfileLight from "../../assets/background/profile-light.png";
-import bgProfileDark from "../../assets/background/profile-dark.png";
+import bgLight from "../../assets/background/Dashboard.webp";
+import bgDark from "../../assets/background/dashboard-dark-mode.webp";
+import bgUpcomingLight from "../../assets/background/upcoming-events-light.webp";
+import bgUpcomingDark from "../../assets/background/upcoming-events-dark.webp";
+import bgRegisteredLight from "../../assets/background/registered-events-light.webp";
+import bgRegisteredDark from "../../assets/background/registered-events-dark.webp";
+import bgRankingBoardLight from "../../assets/background/ranking-board-light.webp";
+import bgRankingBoardDark from "../../assets/background/ranking-board-dark.webp";
+import bgCompletedEventsLight from "../../assets/background/completed-events-light.webp";
+import bgCompletedEventsDark from "../../assets/background/completed-events-dark.webp";
+import bgRankingApprovalLight from "../../assets/background/ranking-approval-light.webp";
+import bgRankingApprovalDark from "../../assets/background/ranking-approval-dark.webp";
+import bgProfileLight from "../../assets/background/profile-light.webp";
+import bgProfileDark from "../../assets/background/profile-dark.webp";
 
 const backgroundImages = {
   dashboard: { light: bgLight, dark: bgDark },

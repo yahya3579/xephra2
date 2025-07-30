@@ -476,13 +476,13 @@ useEffect(() => {
                           </div>
                         </div>
                         <div className="flex gap-2 ml-4">
-                          <button
+                          {/* <button
                             onClick={() => setEditingId(sub.id)}
                             className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4" />
-                          </button>
+                          </button> */}
                           <button
                             onClick={() => handleDelete(sub.paymentId)}
                             className="p-2 text-red-600 hover:bg-red-100 rounded-lg"

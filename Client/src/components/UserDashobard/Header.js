@@ -160,12 +160,12 @@ export default function Header({
           {profile?.userId && (
             <div
               className={`text-sm px-3 py-1 rounded-full ${
-                subscriptionStatus?.isActive ? "bg-[#854951]" : "bg-red-600"
+                subscriptionStatus?.isActive ? "bg-[#854951]" : "bg-gray-500"
               } text-white whitespace-nowrap`}
             >
               {subscriptionStatus?.isActive
                 ? "Subscription Active"
-                : "Subscription Not Active"}
+                : "No Subscription"}
             </div>
           )}
 

@@ -83,7 +83,7 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
           <p className="text-[#C9B796] mt-2  line-clamp-3">{description}</p>
           </Link>
           <div className="mt-4 flex justify-between items-center">
-            <span className="text-xl font-bold text-white">{prizePool}</span>
+            <span className="text-xl font-bold text-white">Prize Pool: PKR {prizePool}</span>
             {isAdmin && (
               <div className="flex space-x-2">
                 <button

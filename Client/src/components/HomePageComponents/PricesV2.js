@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 
 export default function PricesV2({dark}) {
@@ -37,6 +37,19 @@ export default function PricesV2({dark}) {
       popular: false
     }
   ];
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const handlePurchaseClick = (plan) => {
+    setSelectedPlan(plan);
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    setSelectedPlan(null);
+  };
 
   return (
     <div className={`m-4 sm:m-8 lg:m-16 p-4 sm:p-6 lg:p-8 rounded-md shadow-2xl shadow-gray-950 pb-8 sm:pb-10 backdrop-blur-sm ${
@@ -110,11 +123,14 @@ export default function PricesV2({dark}) {
               </div>
 
               {/* Purchase Button */}
-              <button className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-bold text-black text-sm sm:text-base transition-all duration-300 transform hover:scale-105 ${
-                plan.popular
-                  ? 'bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#D19F43] shadow-lg'
-                  : 'bg-[#D19F43] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d]'
-              }`}>
+              <button
+                className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-bold text-black text-sm sm:text-base transition-all duration-300 transform hover:scale-105 ${
+                  plan.popular
+                    ? 'bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#D19F43] shadow-lg'
+                    : 'bg-[#D19F43] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d]'
+                }`}
+                onClick={() => handlePurchaseClick(plan)}
+              >
                 Purchase Now
               </button>
 
@@ -129,6 +145,41 @@ export default function PricesV2({dark}) {
             </div>
           ))}
         </div>
+
+        {/* Popup Modal */}
+        {showPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full relative">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
+                onClick={closePopup}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-[#D19F43]">How to Purchase</h2>
+              <ol className="list-decimal list-inside text-gray-800 space-y-2 mb-4">
+                <li>
+                  <span className="font-semibold">Create an account</span> if you haven't already.
+                </li>
+                <li>
+                  <span className="font-semibold">Go to the Payment Portal page</span> from the menu or navigation.
+                </li>
+                <li>
+                  <span className="font-semibold">Choose and activate your subscription</span> from there.
+                </li>
+              </ol>
+              <div className="text-center">
+                <button
+                  className="bg-[#D19F43] hover:bg-[#b88a2c] text-black font-bold py-2 px-6 rounded-lg transition-all duration-200"
+                  onClick={closePopup}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Bottom decorative text */}
         <div className="text-center mt-8 sm:mt-12 md:mt-16">
