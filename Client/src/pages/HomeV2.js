@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Search, User, Bell } from "lucide-react";
 import logo from "../assets/xephra logo-01.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoMoonSharp } from "react-icons/io5";
 import { ImBrightnessContrast } from "react-icons/im";
 import GamesCardsV2 from "../components/HomePageComponents/GamesCardsV2";
 import UpcomingTournaments from "../components/HomePageComponents/UpcomingTournaments";
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
+import { logout } from "../redux/features/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 import Bg1 from "../assets/homepage/homebg1.webp";
 import Bg2 from "../assets/homepage/homebg2.webp";
 import Bg3 from "../assets/homepage/homebg3.webp";
@@ -20,6 +22,8 @@ const HomeV2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isAuthenticated = localStorage.getItem("isAuthenticated");
   const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+    const dispatch = useDispatch();
 
   const toggleTheme = () => setDark(!dark);
 
@@ -54,6 +58,11 @@ const HomeV2 = () => {
   };
 
   const navItems = ["Home", "Games", "Tournaments", "Prices"];
+
+  const logoutSubmit = () => {
+      dispatch(logout());
+      navigate("/login");
+    };
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
@@ -134,33 +143,46 @@ const HomeV2 = () => {
               )}
             </button>
 
-            <div className="flex md:order-2 space-x-2 sm:space-x-3 md:space-x-0 rtl:space-x-reverse">
+            <div className="flex md:order-2 space-x-2 sm:space-x-3 lg:space-x-2 rtl:space-x-reverse">
+
               {isAuthenticated ? (
-                user && user.role === "admin" ? (
-                  <Link
-                    to="/dashboard"
+                <>
+                  {user && user.role === "admin" ? (
+                    <Link
+                      to="/dashboard"
+                      type="button"
+                      className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
+                    >
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/userdashboard"
+                      type="button"
+                      className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  {/* Logout Button - Only show on sm and up */}
+                  <button
+                    onClick={logoutSubmit}
                     type="button"
-                    className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
+                    className="ml-2 text-white font-montserrat bg-red-500 hover:bg-red-600 focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-red-500 dark:hover:bg-red-600 hidden sm:flex"
                   >
-                    Dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    to="/userdashboard"
-                    type="button"
-                    className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
-                  >
-                    Dashboard
-                  </Link>
-                )
+                    Logout
+                  </button>
+                </>
               ) : (
-                <Link
-                  to="/signup"
-                  type="button"
-                  className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
-                >
-                  Get started
-                </Link>
+                <>
+                  <Link
+                    to="/signup"
+                    type="button"
+                    className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
+                  >
+                    Get started
+                  </Link>
+                </>
               )}
 
               <button
@@ -208,6 +230,16 @@ const HomeV2 = () => {
               {item}
             </button>
           ))}
+          {/* Logout Button in mobile nav */}
+          {isAuthenticated && (
+            <button
+              onClick={logoutSubmit}
+              type="button"
+              className="block w-full text-left font-montserrat font-semibold text-base text-red-500 hover:text-red-600 transition-colors duration-200 sm:hidden"
+            >
+              Logout
+            </button>
+          )}
         </nav>
       )}
 

@@ -65,10 +65,10 @@ const UserPaymentPortal = () => {
       duration: "1 Month",
     },
     {
-      id: "yearly",
-      name: "Yearly Plan",
+      id: "quarterly",
+      name: "Quarterly Plan",
       price: "PKR 3,999",
-      duration: "12 Months",
+      duration: "3 Months",
     },
   ];
 

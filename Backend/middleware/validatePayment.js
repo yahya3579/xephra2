@@ -10,7 +10,7 @@ exports.validatePayment = (req, res, next) => {
     });
   }
 
-  const validPlans = ["weekly", "monthly", "yearly"];
+  const validPlans = ["weekly", "monthly", "quarterly"];
   if (!validPlans.includes(selectedPlan)) {
     return res.status(400).json({
       success: false,

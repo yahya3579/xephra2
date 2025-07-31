@@ -313,10 +313,10 @@ updatePaymentById: async (req, res) => {
           planPrice: "PKR 1,499",
           planDuration: "1 Month",
         },
-        yearly: {
-          planName: "Yearly Plan",
+        quarterly: {
+          planName: "Quarterly Plan",
           planPrice: "PKR 3,999",
-          planDuration: "12 Months",
+          planDuration: "3 Months",
         },
       };
       const plan = planMap[planId];
@@ -368,8 +368,8 @@ updatePaymentById: async (req, res) => {
         case "monthly":
           subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
           break;
-        case "yearly":
-          subscriptionEndDate.setFullYear(subscriptionEndDate.getFullYear() + 1);
+        case "quarterly":
+          subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 3);
           break;
       }
 
