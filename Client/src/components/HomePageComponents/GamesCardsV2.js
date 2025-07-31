@@ -50,7 +50,7 @@ const GamesCardsV2 = ({ dark }) => {
     },
     {
       id: 10,
-      title: "Roblox",
+      title: "Rainbow Six® Siege X",
       image: "https://static-cdn.jtvnw.net/ttv-boxart/460630-285x380.jpg"
     },
   ];

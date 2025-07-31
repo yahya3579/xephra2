@@ -26,13 +26,13 @@ export default function PricesV2({dark}) {
       popular: true
     },
     {
-      name: "YEARLY PLAN", 
+      name: "QUARTERLY PLAN", 
       price: "PKR 3,999",
-      period: "12 Months",
+      period: "3 Months",
       features: [
-        "Perfect For Serious Gamers who want maximum value",
-        "Includes access to all tournaments for full year",
-        "Enjoy VIP status, exclusive tournaments and biggest prizes"
+        "Perfect For Serious Gamers who want great value",
+        "Includes access to all tournaments for three months",
+        "Enjoy VIP status, exclusive tournaments and big prizes"
       ],
       popular: false
     }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -6,6 +7,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import { setupAxiosInterceptors } from "./axiosInterceptor";
+
+// Setup axios interceptor for auto-logout on token expiry
+setupAxiosInterceptors(store);
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"></link>
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

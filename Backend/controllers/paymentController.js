@@ -283,15 +283,14 @@ updatePaymentById: async (req, res) => {
     if (updateData.paymentDetails) {
       const { paymentMethod, transactionId } = updateData.paymentDetails;
       if (paymentMethod) {
-        const methodMap = {
-          hbl: "HBL Bank Transfer",
-          ubl: "UBL Bank Transfer",
-          mcb: "MCB Bank Transfer",
-          jazzcash: "JazzCash",
-          easypaisa: "Easypaisa",
-        };
-        payment.paymentDetails.paymentMethod = paymentMethod;
-        payment.paymentDetails.paymentMethodName = methodMap[paymentMethod] || "";
+        if (paymentMethod !== 'askari') {
+          return res.status(400).json({
+            success: false,
+            message: 'Only Askari Bank is accepted as payment method.'
+          });
+        }
+        payment.paymentDetails.paymentMethod = 'askari';
+        payment.paymentDetails.paymentMethodName = 'Askari Bank Transfer';
       }
       if (transactionId) {
         payment.paymentDetails.transactionId = transactionId;
@@ -313,10 +312,10 @@ updatePaymentById: async (req, res) => {
           planPrice: "PKR 1,499",
           planDuration: "1 Month",
         },
-        yearly: {
-          planName: "Yearly Plan",
+        quarterly: {
+          planName: "Quarterly Plan",
           planPrice: "PKR 3,999",
-          planDuration: "12 Months",
+          planDuration: "3 Months",
         },
       };
       const plan = planMap[planId];
@@ -368,8 +367,8 @@ updatePaymentById: async (req, res) => {
         case "monthly":
           subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
           break;
-        case "yearly":
-          subscriptionEndDate.setFullYear(subscriptionEndDate.getFullYear() + 1);
+        case "quarterly":
+          subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 3);
           break;
       }
 

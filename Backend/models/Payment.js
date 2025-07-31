@@ -7,15 +7,15 @@ const SubscriptionPlanSchema = new Schema({
     type: String,
     required: [true, 'Plan ID is required'],
     enum: {
-      values: ['weekly', 'monthly', 'yearly'],
-      message: 'Plan ID must be weekly, monthly, or yearly'
+      values: ['weekly', 'monthly', 'quarterly'],
+      message: 'Plan ID must be weekly, monthly, or quarterly'
     }
   },
   planName: {
     type: String,
     required: [true, 'Plan name is required'],
     enum: {
-      values: ['Weekly Plan', 'Monthly Plan', 'Yearly Plan'],
+      values: ['Weekly Plan', 'Monthly Plan', 'Quarterly Plan'],
       message: 'Invalid plan name'
     }
   },
@@ -31,7 +31,7 @@ const SubscriptionPlanSchema = new Schema({
     type: String,
     required: [true, 'Plan duration is required'],
     enum: {
-      values: ['1 Week', '1 Month', '12 Months'],
+      values: ['1 Week', '1 Month', '3 Months'],
       message: 'Invalid plan duration'
     }
   }
@@ -92,16 +92,16 @@ const PaymentDetailsSchema = new Schema({
     type: String,
     required: [true, 'Payment method is required'],
     enum: {
-      values: ['hbl', 'ubl', 'mcb', 'jazzcash', 'easypaisa'],
-      message: 'Invalid payment method'
+      values: ['askari'],
+      message: 'Only Askari Bank is allowed as payment method'
     }
   },
   paymentMethodName: {
     type: String,
     required: [true, 'Payment method name is required'],
     enum: {
-      values: ['HBL Bank Transfer', 'UBL Bank Transfer', 'MCB Bank Transfer', 'JazzCash', 'Easypaisa'],
-      message: 'Invalid payment method name'
+      values: ['Askari Bank Transfer'],
+      message: 'Only Askari Bank Transfer is allowed as payment method name'
     }
   },
   transactionId: {
@@ -279,7 +279,7 @@ PaymentSchema.pre('save', function(next) {
     const durationMap = {
       'weekly': 7,
       'monthly': 30,
-      'yearly': 365
+      'quarterly': 90
     };
     
     const days = durationMap[this.selectedPlan.planId] || 30;
