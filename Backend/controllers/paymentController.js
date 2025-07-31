@@ -283,15 +283,14 @@ updatePaymentById: async (req, res) => {
     if (updateData.paymentDetails) {
       const { paymentMethod, transactionId } = updateData.paymentDetails;
       if (paymentMethod) {
-        const methodMap = {
-          hbl: "HBL Bank Transfer",
-          ubl: "UBL Bank Transfer",
-          mcb: "MCB Bank Transfer",
-          jazzcash: "JazzCash",
-          easypaisa: "Easypaisa",
-        };
-        payment.paymentDetails.paymentMethod = paymentMethod;
-        payment.paymentDetails.paymentMethodName = methodMap[paymentMethod] || "";
+        if (paymentMethod !== 'askari') {
+          return res.status(400).json({
+            success: false,
+            message: 'Only Askari Bank is accepted as payment method.'
+          });
+        }
+        payment.paymentDetails.paymentMethod = 'askari';
+        payment.paymentDetails.paymentMethodName = 'Askari Bank Transfer';
       }
       if (transactionId) {
         payment.paymentDetails.transactionId = transactionId;

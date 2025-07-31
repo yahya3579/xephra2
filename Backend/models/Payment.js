@@ -92,16 +92,16 @@ const PaymentDetailsSchema = new Schema({
     type: String,
     required: [true, 'Payment method is required'],
     enum: {
-      values: ['hbl', 'ubl', 'mcb', 'jazzcash', 'easypaisa'],
-      message: 'Invalid payment method'
+      values: ['askari'],
+      message: 'Only Askari Bank is allowed as payment method'
     }
   },
   paymentMethodName: {
     type: String,
     required: [true, 'Payment method name is required'],
     enum: {
-      values: ['HBL Bank Transfer', 'UBL Bank Transfer', 'MCB Bank Transfer', 'JazzCash', 'Easypaisa'],
-      message: 'Invalid payment method name'
+      values: ['Askari Bank Transfer'],
+      message: 'Only Askari Bank Transfer is allowed as payment method name'
     }
   },
   transactionId: {

@@ -74,43 +74,15 @@ const UserPaymentPortal = () => {
 
   const bankAccounts = [
     {
-      id: "hbl",
-      bankName: "HBL (Habib Bank Limited)",
-      accountTitle: "Your Company Name",
-      accountNumber: "12345678901234",
-      iban: "PK36HABB0012345678901234",
-      branchCode: "1234",
-    },
-    {
-      id: "ubl",
-      bankName: "UBL (United Bank Limited)",
-      accountTitle: "Your Company Name",
-      accountNumber: "98765432109876",
-      iban: "PK91UNIL0987654321098765",
-      branchCode: "9876",
-    },
-    {
-      id: "mcb",
-      bankName: "MCB (Muslim Commercial Bank)",
-      accountTitle: "Your Company Name",
-      accountNumber: "11223344556677",
-      iban: "PK70MUCB1122334455667788",
-      branchCode: "5566",
+      id: "askari",
+      bankName: "Askari Bank Limited",
+      accountTitle: "XEPHRA (PRIVATE) LIMITED",
+      accountNumber: "03410900000284",
+      iban: "PK64ASCM0003410900000284",
     },
   ];
 
-  const jazzcashEasypaisa = {
-    jazzcash: {
-      name: "JazzCash",
-      number: "03XX-XXXXXXX",
-      accountTitle: "Your Company Name",
-    },
-    easypaisa: {
-      name: "Easypaisa",
-      number: "03XX-XXXXXXX",
-      accountTitle: "Your Company Name",
-    },
-  };
+  // Mobile wallet details removed as per requirements
 
   // Validation functions
   const validatePhoneNumber = (phone) => {
@@ -170,7 +142,7 @@ const UserPaymentPortal = () => {
     e.preventDefault();
 
     // Comprehensive validation
-    if (!selectedPlan || !paymentMethod || !selectedFile) {
+    if (!selectedPlan || !selectedFile) {
       alert("Please complete all required fields");
       return;
     }
@@ -227,52 +199,22 @@ const UserPaymentPortal = () => {
       planDuration: selectedPlanData.duration,
     };
 
-    // Map payment method to required format
+    // Only Askari Bank is available as payment method
     const paymentMethodMap = {
-      hbl: "HBL Bank Transfer",
-      ubl: "UBL Bank Transfer",
-      mcb: "MCB Bank Transfer",
-      jazzcash: "JazzCash",
-      easypaisa: "Easypaisa",
+      askari: "Askari Bank Transfer",
     };
 
-    // Get account details based on payment method
     const getAccountDetails = () => {
-      switch (paymentMethod) {
-        case "hbl":
-          return {
-            bankName: "HBL (Habib Bank Limited)",
-            accountNumber: bankAccounts[0].accountNumber,
-            iban: bankAccounts[0].iban,
-          };
-        case "ubl":
-          return {
-            bankName: "UBL (United Bank Limited)",
-            accountNumber: bankAccounts[1].accountNumber,
-            iban: bankAccounts[1].iban,
-          };
-        case "mcb":
-          return {
-            bankName: "MCB (Muslim Commercial Bank)",
-            accountNumber: bankAccounts[2].accountNumber,
-            iban: bankAccounts[2].iban,
-          };
-        case "jazzcash":
-          return {
-            mobileNumber: jazzcashEasypaisa.jazzcash.number,
-          };
-        case "easypaisa":
-          return {
-            mobileNumber: jazzcashEasypaisa.easypaisa.number,
-          };
-        default:
-          return {};
-      }
+      return {
+        bankName: "Askari Bank Limited",
+        accountNumber: "03410900000284",
+        iban: "PK64ASCM0003410900000284",
+      };
     };
 
     const paymentDetails = {
-      paymentMethod: paymentMethod,
-      paymentMethodName: paymentMethodMap[paymentMethod] || paymentMethod,
+      paymentMethod: "askari",
+      paymentMethodName: paymentMethodMap["askari"],
       transactionId: formData.transactionId.trim(),
       accountDetails: getAccountDetails(),
     };
@@ -412,117 +354,53 @@ const UserPaymentPortal = () => {
               <CreditCard className="w-6 h-6 mr-2" /> Payment Methods
             </h2>
 
-            {/* Bank Transfer Section */}
+            {/* Bank Transfer Section (Askari Bank Only) */}
             <div className="mb-8">
               <h3 className="text-lg font-medium mb-4 flex items-center">
                 <Building className="w-5 h-5 mr-2" /> Bank Transfer Details
               </h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bankAccounts.map((bank) => (
-                  <div
-                    key={bank.id}
-                    className="border rounded-lg p-4 bg-[#2a2a3b]"
-                  >
-                    <h4 className="font-semibold text-[#00ffcc] mb-3">
-                      {bank.bankName}
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="font-medium">Account Title:</span>
-                        <p className="text-gray-300">{bank.accountTitle}</p>
-                      </div>
-                      <div>
-                        <span className="font-medium">Account Number:</span>
-                        <div className="flex items-center justify-between">
-                          <p className="text-gray-300 font-mono">
-                            {bank.accountNumber}
-                          </p>
-                          <button
-                            onClick={() => copyToClipboard(bank.accountNumber)}
-                            className="text-[#00ffcc] hover:text-white text-sm"
-                          >
-                            {copiedText === bank.accountNumber
-                              ? "Copied"
-                              : "Copy"}
-                          </button>
-                        </div>
-                      </div>
-                      <div>
-                        <span className="font-medium">IBAN:</span>
-                        <div className="flex items-center justify-between">
-                          <p className="text-gray-300 font-mono text-xs">
-                            {bank.iban}
-                          </p>
-                          <button
-                            onClick={() => copyToClipboard(bank.iban)}
-                            className="text-[#00ffcc] hover:text-white text-sm"
-                          >
-                            {copiedText === bank.iban ? "Copied" : "Copy"}
-                          </button>
-                        </div>
-                      </div>
+              <div className="border rounded-lg p-4 bg-[#2a2a3b] max-w-md">
+                <h4 className="font-semibold text-[#00ffcc] mb-3">
+                  Askari Bank Limited
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <span className="font-medium">Account Title:</span>
+                    <p className="text-gray-300">XEPHRA (PRIVATE) LIMITED</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Account Number:</span>
+                    <div className="flex items-center justify-between">
+                      <p className="text-gray-300 font-mono">
+                        03410900000284
+                      </p>
+                      <button
+                        onClick={() => copyToClipboard("03410900000284")}
+                        className="text-[#00ffcc] hover:text-white text-sm"
+                      >
+                        {copiedText === "03410900000284" ? "Copied" : "Copy"}
+                      </button>
                     </div>
                   </div>
-                ))}
+                  <div>
+                    <span className="font-medium">IBAN:</span>
+                    <div className="flex items-center justify-between">
+                      <p className="text-gray-300 font-mono text-xs">
+                        PK64ASCM0003410900000284
+                      </p>
+                      <button
+                        onClick={() => copyToClipboard("PK64ASCM0003410900000284")}
+                        className="text-[#00ffcc] hover:text-white text-sm"
+                      >
+                        {copiedText === "PK64ASCM0003410900000284" ? "Copied" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Mobile Wallet Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-4 flex items-center">
-                <Phone className="w-5 h-5 mr-2" /> Mobile Wallet Details
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {Object.keys(jazzcashEasypaisa).map((key) => (
-                  <div
-                    key={key}
-                    className={`border rounded-lg p-4 ${
-                      key === "jazzcash" ? "bg-[#331a00]" : "bg-[#003319]"
-                    }`}
-                  >
-                    <h4
-                      className={`font-semibold ${
-                        key === "jazzcash"
-                          ? "text-orange-400"
-                          : "text-green-400"
-                      } mb-3`}
-                    >
-                      {jazzcashEasypaisa[key].name}
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="font-medium">Account Title:</span>
-                        <p className="text-gray-300">
-                          {jazzcashEasypaisa[key].accountTitle}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-medium">Mobile Number:</span>
-                        <div className="flex items-center justify-between">
-                          <p className="text-gray-300 font-mono">
-                            {jazzcashEasypaisa[key].number}
-                          </p>
-                          <button
-                            onClick={() =>
-                              copyToClipboard(jazzcashEasypaisa[key].number)
-                            }
-                            className={`text-sm ${
-                              key === "jazzcash"
-                                ? "text-orange-400 hover:text-white"
-                                : "text-green-400 hover:text-white"
-                            }`}
-                          >
-                            {copiedText === jazzcashEasypaisa[key].number
-                              ? "Copied"
-                              : "Copy"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Mobile Wallet Section removed as per requirements */}
 
             {/* Payment Form */}
             <div className="bg-[#2a2a3b] rounded-lg p-6">
@@ -583,18 +461,14 @@ const UserPaymentPortal = () => {
                     </p>
                   </div>
                 </div>
+                {/* Only Askari Bank is available as payment method */}
                 <select
                   required
-                  value={paymentMethod}
-                  onChange={(e) => dispatch(setPaymentMethod(e.target.value))}
-                  className="w-full p-3 border rounded-md mb-4 bg-[#1e1e2f] border-gray-600 focus:border-[#00ffcc] text-white"
+                  value={"askari"}
+                  disabled
+                  className="w-full p-3 border rounded-md mb-4 bg-[#1e1e2f] border-gray-600 focus:border-[#00ffcc] text-white cursor-not-allowed"
                 >
-                  <option value="">Select Payment Method *</option>
-                  <option value="hbl">HBL Bank Transfer</option>
-                  <option value="ubl">UBL Bank Transfer</option>
-                  <option value="mcb">MCB Bank Transfer</option>
-                  <option value="jazzcash">JazzCash</option>
-                  <option value="easypaisa">Easypaisa</option>
+                  <option value="askari">Askari Bank Transfer</option>
                 </select>
 
                 {/* File Upload */}
