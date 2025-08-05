@@ -20,6 +20,12 @@ const TournamentCard = ({
   const { loading, error, message } = useSelector((state) => state.events);
   const { subscriptionStatus } = useSelector((state) => state.payment);
   const [showPopup, setShowPopup] = useState(false);
+  const [showJoinForm, setShowJoinForm] = useState(false);
+  const [joinFormData, setJoinFormData] = useState({
+    mode: 'solo',
+    uniqueIds: [''],
+    eventId: _id
+  });
   const dispatch = useDispatch();
   const userId = JSON.parse(localStorage.getItem("user")).UserId;
   
@@ -73,14 +79,73 @@ const TournamentCard = ({
       return;
     }
 
+    // Show join form
+    setJoinFormData({
+      mode: 'solo',
+      uniqueIds: [''],
+      eventId: _id
+    });
+    setShowJoinForm(true);
+  };
+
+  const handleModeChange = (mode) => {
+    let uniqueIdsCount = 1;
+    if (mode === 'duos') uniqueIdsCount = 2;
+    if (mode === 'squads') uniqueIdsCount = 4;
+
+    setJoinFormData({
+      ...joinFormData,
+      mode,
+      uniqueIds: Array(uniqueIdsCount).fill('')
+    });
+  };
+
+  const handleUniqueIdChange = (index, value) => {
+    const newUniqueIds = [...joinFormData.uniqueIds];
+    newUniqueIds[index] = value;
+    setJoinFormData({
+      ...joinFormData,
+      uniqueIds: newUniqueIds
+    });
+  };
+
+  const handleSubmitJoin = () => {
+    // Validate form
+    if (joinFormData.uniqueIds.some(id => !id.trim())) {
+      toast.error("Please fill in all unique IDs");
+      return;
+    }
+
     // Show loading toast
     const loadingToast = toast.loading("Joining event...");
     
-    dispatch(joinEvent({ userId, eventId })).then((result) => {
+    dispatch(joinEvent({ 
+      userId, 
+      eventId: joinFormData.eventId,
+      mode: joinFormData.mode,
+      uniqueIds: joinFormData.uniqueIds
+    })).then((result) => {
       // Dismiss loading toast
       toast.dismiss(loadingToast);
       
+      if (result.meta.requestStatus === 'fulfilled') {
+        setShowJoinForm(false);
+        setJoinFormData({
+          mode: 'solo',
+          uniqueIds: [''],
+          eventId: ''
+        });
+      }
       // Success/error will be handled by the useEffect above
+    });
+  };
+
+  const closeJoinForm = () => {
+    setShowJoinForm(false);
+    setJoinFormData({
+      mode: 'solo',
+      uniqueIds: [''],
+      eventId: ''
     });
   };
 
@@ -161,6 +226,107 @@ const TournamentCard = ({
                   </button>
                 </Link>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Join Event Form Popup */}
+      {showJoinForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#000000] border border-[#D19F43] rounded-lg p-6 max-w-md mx-4 relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={closeJoinForm}
+              className="absolute top-2 right-2 text-[#C9B796] hover:text-[#D19F43] text-xl font-bold"
+            >
+              ×
+            </button>
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-[#D19F43] mb-2">
+                Join Event
+              </h3>
+              <p className="text-[#C9B796] text-sm">
+                {title}
+              </p>
+            </div>
+
+            {/* Game Mode Selection */}
+            <div className="mb-6">
+              <label className="block text-[#C9B796] font-semibold mb-3">
+                Select Game Mode:
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="solo"
+                    checked={joinFormData.mode === 'solo'}
+                    onChange={(e) => handleModeChange(e.target.value)}
+                    className="mr-3 text-[#D19F43] focus:ring-[#D19F43]"
+                  />
+                  <span className="text-[#C9B796]">Solo (1 Player)</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="duos"
+                    checked={joinFormData.mode === 'duos'}
+                    onChange={(e) => handleModeChange(e.target.value)}
+                    className="mr-3 text-[#D19F43] focus:ring-[#D19F43]"
+                  />
+                  <span className="text-[#C9B796]">Duos (2 Players)</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="squads"
+                    checked={joinFormData.mode === 'squads'}
+                    onChange={(e) => handleModeChange(e.target.value)}
+                    className="mr-3 text-[#D19F43] focus:ring-[#D19F43]"
+                  />
+                  <span className="text-[#C9B796]">Squads (4 Players)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Unique IDs Fields */}
+            <div className="mb-6">
+              <label className="block text-[#C9B796] font-semibold mb-3">
+                Unique IDs:
+              </label>
+              <div className="space-y-3">
+                {joinFormData.uniqueIds.map((id, index) => (
+                  <div key={index}>
+                    <input
+                      type="text"
+                      placeholder={`Player ${index + 1} Unique ID`}
+                      value={id}
+                      onChange={(e) => handleUniqueIdChange(index, e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#D19F43] rounded-md text-[#C9B796] placeholder-[#666] focus:outline-none focus:border-[#eb9a0d] transition-colors"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={closeJoinForm}
+                className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitJoin}
+                disabled={loading}
+                className="px-6 py-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black rounded-md hover:opacity-90 transition disabled:opacity-50"
+              >
+                {loading ? "Joining..." : "Join Event"}
+              </button>
             </div>
           </div>
         </div>
