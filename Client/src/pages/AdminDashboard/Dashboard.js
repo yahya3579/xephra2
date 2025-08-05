@@ -7,7 +7,8 @@ import RankingApproval from "../../components/AdminDashobard/RankingApproval";
 import Dashboardadmin from "../../components/AdminDashobard/Dashboardadmin";
 import logo from "../../assets/xephra logo-01.png";
 import AdminProfile from "../../components/AdminDashobard/AdminProfile";
-import { TbLogout2 } from "react-icons/tb";
+import AdminNotificationPanel from "../../components/Notifications/AdminNotificationPanel";
+import NotificationDebug from "../../components/Notifications/NotificationDebug";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -43,6 +44,7 @@ const backgroundImages = {
     dark: bgRankingApprovalDark,
   },
   adminProfile: { light: bgProfileLight, dark: bgProfileDark },
+  notifications: { light: bgLight, dark: bgDark },
 };
 
 // Sidebar component
@@ -81,11 +83,11 @@ function Sidebar({ onMenuClick, dark }) {
                   }`}
                 aria-hidden="true"
               />
-              <a
+              <button
                 className={`inline-flex items-center w-full text-sm font-semibold transition-colors duration-150  dark:hover:text-gray-200 dark:text-gray-100`}
               >
                 <span className="ml-4">{item.name}</span>
-              </a>
+              </button>
             </li>
           ))}
         </ul>
@@ -176,6 +178,13 @@ function Dashboard() {
         return <CompletedEvents dark={dark} />;
       case "rankingApproval":
         return <RankingApproval dark={dark} />;
+      case "notifications":
+        return (
+          <div>
+            <NotificationDebug />
+            <AdminNotificationPanel />
+          </div>
+        );
       case "adminProfile":
         return <AdminProfile dark={dark} profile={profile} />;
       default:

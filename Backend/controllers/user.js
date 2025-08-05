@@ -9,6 +9,7 @@ const AdminChat = require("../models/AdminChatGroup");
 const AdminMessageModel = require("../models/AdminMessage");
 const AdminMessage = require("../models/AdminMessage");
 const UserEventStats = require('../models/userEventStats');
+const { notifyUserRegisteredEvent } = require("../utils/notificationHelpers");
 // POST: Create a new user profile
 exports.createProfile = async (req, res) => {
   const {
@@ -382,6 +383,15 @@ exports.joinEvent = async (req, res) => {
     if (!chatGroupUserIds.includes(userIdStr)) {
       chatGroup.users.push(userId);
       await chatGroup.save();
+    }
+
+    // Send notification to admin about user registration
+    try {
+      const userData = await User.findOne({ userId });
+      await notifyUserRegisteredEvent(participant, event, userData);
+    } catch (notificationError) {
+      console.error('Error sending user registration notification:', notificationError);
+      // Don't fail the main request if notification fails
     }
 
     res.status(201).json({

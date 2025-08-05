@@ -8,6 +8,7 @@ import UpcomingEvents from "../../components/UserDashobard/UpcomingEvents";
 import RegisteredEvents from "../../components/UserDashobard/RegisteredEvents";
 import RankingBoard from "../../components/UserDashobard/RankingBoard";
 import RankingApproval from "../../components/UserDashobard/RankingApproval";
+import UserNotificationPanel from "../../components/Notifications/UserNotificationPanel";
 import { TbLogout2 } from "react-icons/tb";
 import { logout } from "../../redux/features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -179,6 +180,8 @@ function Dashboard() {
         return <CompletedEvents dark={dark} />;
       case "rankingApproval":
         return <RankingApproval dark={dark} />;
+      case "notifications":
+        return <UserNotificationPanel dark={dark} />;
       case "userProfile":
         return <UserProfile dark={dark} profile={profile} />;
       default:

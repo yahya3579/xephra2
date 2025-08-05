@@ -1,9 +1,13 @@
+// EXAMPLE: Updated Admin Header with Notification Bell Integration
+// File: Client/src/components/AdminDashobard/Header.js
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { IoMoonSharp } from "react-icons/io5";
 import { ImBrightnessContrast } from "react-icons/im";
 import { useDispatch, useSelector } from "react-redux";
+// ✅ ADD THIS IMPORT
 import NotificationBell from "../Notifications/NotificationBell";
 
 export default function Header({
@@ -14,21 +18,8 @@ export default function Header({
   onMenuClick, 
   profile,
 }) {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-  
-  // Debug auth state
-  console.log('Admin Header - Auth state:', { 
-    user: !!user, 
-    userId: user?._id, 
-    isAuthenticated,
-    profileId: profile?.userId || profile?._id,
-    profile: profile 
-  });
-
-  // Use user._id, or profile.userId, or fallback to 'admin'
-  const userId = user?._id || profile?.userId || profile?._id || 'admin';
-  
-  console.log('Admin Header - Computed userId:', userId);
+  // ✅ ADD THIS LINE TO GET USER DATA
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <header className={`z-10 py-4`}>
@@ -57,9 +48,9 @@ export default function Header({
                )}
              </button>
    
-             {/* Notifications Bell */}
+             {/* ✅ REPLACE THE OLD NOTIFICATION BUTTON WITH THIS */}
              <NotificationBell 
-               userId={userId}
+               userId={user?._id}
                userType="admin"
                isAdmin={true}
              />

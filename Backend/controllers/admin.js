@@ -9,6 +9,11 @@ const { default: mongoose } = require("mongoose");
 const UserSubmission = require("../models/UserSubmission");
 const UserProfile = require("../models/UserProfile");
 const ChatGroup = require('../models/ChatGroup');
+const { 
+  notifyEventCreated,
+  notifyUserRegisteredEvent,
+  notifyEventCompleted
+} = require("../utils/notificationHelpers");
 
 exports.newEvent = async (req, res) => {
   try {
@@ -53,6 +58,21 @@ exports.newEvent = async (req, res) => {
     });
 
     await newEvent.save();
+    
+    // Send notification to all users about new event
+    try {
+      // Get all active users
+      const activeUsers = await User.find({ isSuspended: false }, 'userId');
+      const userIds = activeUsers.map(user => user.userId);
+      
+      if (userIds.length > 0) {
+        await notifyEventCreated(newEvent, userIds);
+      }
+    } catch (notificationError) {
+      console.error('Error sending event creation notifications:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+    
     res.status(201).json({
       message: "Event and chat group created successfully",
       event: newEvent,
@@ -364,6 +384,19 @@ exports.markEventAsHosted = async (req, res) => {
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Send completion notification to all participants
+    try {
+      const participants = await Participant.find({ eventId });
+      const participantUserIds = participants.map(p => p.userId);
+      
+      if (participantUserIds.length > 0) {
+        await notifyEventCompleted(event, participantUserIds);
+      }
+    } catch (notificationError) {
+      console.error('Error sending event completion notifications:', notificationError);
+      // Don't fail the main request if notification fails
     }
 
     res.status(200).json({ message: "Event hosted successfully", event });

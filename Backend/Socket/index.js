@@ -2,33 +2,51 @@ const { Server } = require("socket.io");
 const MessageModel = require("../models/Message");
 const AdminChatGroupModel = require("../models/AdminChatGroup");
 const AdminMessageModel = require("../models/AdminMessage");
+const { NotificationService } = require("../controllers/notificationController");
 
-  const socketSetup = (server) => {
-    const io = new Server(server, {
-      cors: {
-      // origin: "https://xephra.net", // Update with your frontend URL
-        // origin: "https://xephra-two.vercel.app",
-        origin: "http://xephra.net",
-        // origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-        credentials: true
-      },
-      transports: ["websocket", "polling"]  
-    });
+const socketSetup = (server) => {
+  const io = new Server(server, {
+    cors: {
+    // origin: "https://xephra.net", // Update with your frontend URL
+      // origin: "https://xephra-two.vercel.app",
+      origin: "http://xephra.net",
+      // origin: ["http://localhost:3000", "http://127.0.0.1:5500", "http://localhost:5500"],
+      methods: ["GET", "POST"],
+      credentials: true
+    },
+    transports: ["websocket", "polling"]  
+  });
+
+  // Initialize notification service with socket.io instance
+  const notificationService = new NotificationService(io);
 
   // Keep track of online users and their socket connections
   const activeUsers = new Map(); // userId -> online status
   const userSockets = new Map(); // socketId -> userId
+  const adminSockets = new Set(); // Set of admin socket IDs
 
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     
     // Store user information if provided in the query
     const userId = socket.handshake.query.userId;
+    const userType = socket.handshake.query.userType || 'user';
+    
     if (userId) {
       activeUsers.set(userId, true);
-      userSockets.set(socket.id, userId);
-      console.log(`User ${userId} is now online`);
+      userSockets.set(socket.id, { userId, userType });
+      
+      // Join user-specific room for notifications
+      const userRoom = `${userType}_${userId}`;
+      socket.join(userRoom);
+      
+      // If admin, also join general admin dashboard room
+      if (userType === 'admin') {
+        socket.join('admin_dashboard');
+        adminSockets.add(socket.id);
+      }
+      
+      console.log(`${userType} ${userId} is now online and joined room: ${userRoom}`);
     }
 
     // Handle sending messages
@@ -91,21 +109,69 @@ const AdminMessageModel = require("../models/AdminMessage");
       }
     });
 
+    // Handle notification-related events
+    socket.on("joinNotificationRoom", ({ userId, userType }) => {
+      const roomName = `${userType}_${userId}`;
+      socket.join(roomName);
+      console.log(`Socket ${socket.id} joined notification room: ${roomName}`);
+    });
+
+    socket.on("leaveNotificationRoom", ({ userId, userType }) => {
+      const roomName = `${userType}_${userId}`;
+      socket.leave(roomName);
+      console.log(`Socket ${socket.id} left notification room: ${roomName}`);
+    });
+
+    // Handle marking notification as read in real-time
+    socket.on("markNotificationRead", ({ notificationId, userId, userType }) => {
+      // Broadcast to all user's connected devices
+      const roomName = `${userType}_${userId}`;
+      socket.to(roomName).emit("notificationMarkedRead", { notificationId });
+    });
+
+    // Handle real-time typing indicators for notifications
+    socket.on("adminTypingNotification", ({ recipientId }) => {
+      const roomName = `user_${recipientId}`;
+      socket.to(roomName).emit("adminTypingNotification", { 
+        isTyping: true,
+        timestamp: new Date()
+      });
+    });
+
+    socket.on("adminStoppedTypingNotification", ({ recipientId }) => {
+      const roomName = `user_${recipientId}`;
+      socket.to(roomName).emit("adminTypingNotification", { 
+        isTyping: false,
+        timestamp: new Date()
+      });
+    });
+
     // Handle user disconnection
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
       
       // Clean up when user disconnects
       if (userSockets.has(socket.id)) {
-        const userId = userSockets.get(socket.id);
+        const { userId, userType } = userSockets.get(socket.id);
         activeUsers.delete(userId);
         userSockets.delete(socket.id);
         
+        // Remove from admin sockets if was admin
+        if (userType === 'admin') {
+          adminSockets.delete(socket.id);
+        }
+        
+        console.log(`${userType} ${userId} disconnected`);
       }
     });
   });
 
+  // Attach notification service to io instance for external access
+  io.notificationService = notificationService;
+
   return io;
 };
+
+module.exports = socketSetup;
 
 module.exports = socketSetup;

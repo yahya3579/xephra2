@@ -1,6 +1,12 @@
 const Payment = require("../models/Payment");
 const path = require("path");
 const fs = require("fs").promises;
+const { 
+  notifySubscriptionSubmitted,
+  notifySubscriptionApproved,
+  notifySubscriptionRejected,
+  notifySubscriptionEdited
+} = require("../utils/notificationHelpers");
 
 const paymentController = {
   createPayment: async (req, res) => {
@@ -76,6 +82,9 @@ const paymentController = {
       });
 
       await payment.save();
+
+      // Send notification to admin about new subscription submission
+      await notifySubscriptionSubmitted(payment);
 
       res.status(201).json({
         success: true,
@@ -458,6 +467,9 @@ updatePaymentById: async (req, res) => {
 
       await payment.save();
 
+      // Send notification to user about subscription approval
+      await notifySubscriptionApproved(payment._id, payment.userDetails.userId);
+
       res.status(200).json({
         success: true,
         message: "Payment verified successfully",
@@ -574,6 +586,9 @@ updatePaymentById: async (req, res) => {
       };
 
       await payment.save();
+
+      // Send notification to user about subscription rejection
+      await notifySubscriptionRejected(payment._id, payment.userDetails.userId, rejectionReason.trim());
 
       res.status(200).json({
         success: true,

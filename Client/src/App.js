@@ -1,7 +1,9 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
+import socketService from "./utils/socket";
 
 import Loading from "./utils/Loading/Loading";
 import RegisterEventDetailUser from "./components/UserDashobard/RegisterEventDetailUser";
@@ -49,6 +51,20 @@ const Home = lazy(() => import("./pages/Home"));
 const ChatSystem = lazy(() => import("./components/ChatSystem"));
 
 export default function App() {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated && user?._id) {
+      socketService.connect(user._id);
+    }
+
+    return () => {
+      if (!isAuthenticated) {
+        socketService.disconnect();
+      }
+    };
+  }, [isAuthenticated, user]);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<Loading />}>

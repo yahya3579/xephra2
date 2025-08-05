@@ -120,9 +120,9 @@ import { Link } from "react-router-dom";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { IoMoonSharp } from "react-icons/io5";
 import { ImBrightnessContrast } from "react-icons/im";
-import { FiBell } from "react-icons/fi";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import { useDispatch, useSelector } from "react-redux";
+import NotificationBell from "../Notifications/NotificationBell";
 
 export default function Header({
   dark,
@@ -134,6 +134,18 @@ export default function Header({
 }) {
   const dispatch = useDispatch();
   const { subscriptionStatus } = useSelector((state) => state.payment);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  // Debug auth state
+  console.log('User Header - Auth state:', { 
+    user: !!user, 
+    userId: user?._id, 
+    isAuthenticated,
+    profileId: profile?.userId || profile?._id 
+  });
+
+  // Use user._id, or profile.userId, or fallback
+  const userId = user?._id || profile?.userId || profile?._id;
 
   useEffect(() => {
     const userId = profile?.userId || localStorage.getItem("userId");
@@ -182,13 +194,12 @@ export default function Header({
             )}
           </button>
 
-          {/* Notification Button */}
-          <button
-            className="p-2 rounded-full focus:outline-none hover:bg-gray-300 dark:hover:bg-gray-700"
-            aria-label="Notifications"
-          >
-            <FiBell className="text-[#C9B796]" />
-          </button>
+          {/* Notification Bell */}
+          <NotificationBell 
+            userId={userId}
+            userType="user"
+            isAdmin={false}
+          />
 
           {/* Profile */}
           <Link>
