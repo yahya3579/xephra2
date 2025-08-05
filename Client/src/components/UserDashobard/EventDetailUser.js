@@ -6,6 +6,7 @@ import { getEventById, joinEvent } from "../../redux/features/eventsSlice";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import Loading from "../../utils/Loading/Loading";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const EventDetailUser = () => {
   const dispatch = useDispatch();
@@ -22,23 +23,59 @@ const EventDetailUser = () => {
   }, []);
 
   // Check subscription status when component mounts
-    useEffect(() => {
-      if (userId) {
-        dispatch(getSubscriptionStatus(userId));
-      }
-    }, [dispatch, userId]);
+  useEffect(() => {
+    if (userId) {
+      const loadingToast = toast.loading("Checking subscription status...");
+      dispatch(getSubscriptionStatus(userId)).then((result) => {
+        toast.dismiss(loadingToast);
+        // Error will be handled by the subscription error useEffect
+      });
+    }
+  }, [dispatch, userId]);
 
+  // Load event details
   useEffect(() => {
     if (eventId) {
-      dispatch(getEventById(eventId));
+      const loadingToast = toast.loading("Loading event details...");
+      dispatch(getEventById(eventId)).then((result) => {
+        toast.dismiss(loadingToast);
+        if (result.meta.requestStatus === 'fulfilled') {
+          toast.success("Event details loaded successfully!");
+        }
+        // Error will be handled by the event error useEffect
+      });
     }
   }, [dispatch, eventId]);
+
+  // Handle join event success and error
+  useEffect(() => {
+    if (message && !loading) {
+      toast.success(message);
+    }
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [message, error, loading]);
+
+  // Handle subscription status errors
+  useEffect(() => {
+    if (subscriptionStatus?.error && !subscriptionStatus?.loading) {
+      toast.error(subscriptionStatus.error);
+    }
+  }, [subscriptionStatus?.error, subscriptionStatus?.loading]);
+
+  // Handle event not found
+  useEffect(() => {
+    if (error && error.includes("not found") && !loading) {
+      toast.error("Event not found or has been removed.");
+    }
+  }, [error, loading]);
 
   
   const handleJoin = (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
 
@@ -48,12 +85,24 @@ const EventDetailUser = () => {
       return;
     }
 
-    dispatch(joinEvent({ userId, eventId }));
-    alert("joined Successfully");
+    // Show loading toast
+    const loadingToast = toast.loading("Joining event...");
+    
+    dispatch(joinEvent({ userId, eventId })).then((result) => {
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+      
+      // Success/error will be handled by the useEffect above
+    });
   };
 
   const closePopup = () => {
     setShowPopup(false);
+  };
+
+  const handleActivateSubscription = () => {
+    setShowPopup(false);
+    toast.success("Redirecting to payment portal...");
   };
 
   if (!event) {
@@ -72,6 +121,7 @@ const EventDetailUser = () => {
   }
   if (error) {
     console.log("error is", error);
+    // Error toast is handled by useEffect above
   }
 
   return (
@@ -144,7 +194,7 @@ const EventDetailUser = () => {
                       </button>
                       <Link to="/paymentportal">
                         <button
-                          onClick={closePopup}
+                          onClick={handleActivateSubscription}
                           className="px-6 py-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black rounded-md hover:opacity-90 transition"
                         >
                           Activate Subscription

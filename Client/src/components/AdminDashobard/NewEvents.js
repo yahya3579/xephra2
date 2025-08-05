@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from "react-hot-toast";
 
 const NewEvents = ({ setActiveMenu, dark }) => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.events);
+  const { loading, error, message } = useSelector((state) => state.events);
   const [formData, setFormData] = useState({
     title: "",
     game: "",
@@ -33,6 +34,16 @@ const NewEvents = ({ setActiveMenu, dark }) => {
     });
   };
 
+  // Handle success and error messages
+  useEffect(() => {
+    if (message && !loading) {
+      toast.success(message);
+    }
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [message, error, loading]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formDataToSubmit = new FormData();
@@ -54,19 +65,27 @@ const NewEvents = ({ setActiveMenu, dark }) => {
         formDataToSubmit.append("adminId", adminId);
     }
 
-    dispatch(createEvent(formDataToSubmit));
-    setFormData({
-      title: "",
-      game: "",
-      date: "",
-      time: "",
-      description: "",
-      image: null,
-      prizePool: "",
-      rules: "",
+    const loadingToast = toast.loading("Creating event...");
+    
+    dispatch(createEvent(formDataToSubmit)).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        toast.success("Event created successfully!");
+        setFormData({
+          title: "",
+          game: "",
+          date: "",
+          time: "",
+          description: "",
+          image: null,
+          prizePool: "",
+          rules: "",
+        });
+        // Optionally redirect to posted events
+        // setActiveMenu("postedEvents");
+      }
+      // Error will be handled by useEffect above
     });
-
-    // setActiveMenu("postedEvents");
   };
   if (loading) {
     return <Loading />;
@@ -194,7 +213,6 @@ const NewEvents = ({ setActiveMenu, dark }) => {
             Create Event
           </button>
         </div>
-        {error && <p className="text-red-500">{error?.error}</p>}
       </form>
     </div>
   );

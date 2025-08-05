@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getEvents, joinEvent } from "../../redux/features/eventsSlice";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from "react-hot-toast";
 
 const TournamentCard = ({
   _id,
@@ -25,14 +26,54 @@ const TournamentCard = ({
   // Check subscription status when component mounts
   useEffect(() => {
     if (userId) {
-      dispatch(getSubscriptionStatus(userId));
+      const loadingToast = toast.loading("Checking subscription status...");
+      dispatch(getSubscriptionStatus(userId)).then((result) => {
+        toast.dismiss(loadingToast);
+        // Error will be handled by the subscription error useEffect
+      });
     }
   }, [dispatch, userId]);
+
+  // Handle join event success and error
+  useEffect(() => {
+    if (message && !loading) {
+      toast.success(message);
+    }
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [message, error, loading]);
+
+  // Handle subscription status errors
+  useEffect(() => {
+    if (subscriptionStatus?.error && !subscriptionStatus?.loading) {
+      toast.error(subscriptionStatus.error);
+    }
+  }, [subscriptionStatus?.error, subscriptionStatus?.loading]);
+
+  // Handle events loading errors
+  useEffect(() => {
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [error, loading]);
+
+  // Show success when events are loaded
+  useEffect(() => {
+    if (eventsLoaded && !loading) {
+      if (events.length > 0) {
+        toast.success(`Loaded ${events.length} events successfully!`);
+      } else {
+        toast.info("No events available at the moment.");
+      }
+      setEventsLoaded(false); // Reset to prevent showing again
+    }
+  }, [eventsLoaded, events.length, loading]);
 
   const handleJoin = (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
 
@@ -42,12 +83,24 @@ const TournamentCard = ({
       return;
     }
 
-    dispatch(joinEvent({ userId, eventId }));
-    alert("joined Successfully");
+    // Show loading toast
+    const loadingToast = toast.loading("Joining event...");
+    
+    dispatch(joinEvent({ userId, eventId })).then((result) => {
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+      
+      // Success/error will be handled by the useEffect above
+    });
   };
 
   const closePopup = () => {
     setShowPopup(false);
+  };
+
+  const handleActivateSubscription = () => {
+    setShowPopup(false);
+    toast.success("Redirecting to payment portal...");
   };
 
   const imageUrl = `${process.env.REACT_APP_BACKEND}/${image}`;
@@ -111,7 +164,7 @@ const TournamentCard = ({
                 </button>
                 <Link to="/paymentportal">
                   <button
-                    onClick={closePopup}
+                    onClick={handleActivateSubscription}
                     className="px-6 py-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black rounded-md hover:opacity-90 transition"
                   >
                     Activate Subscription
@@ -131,9 +184,17 @@ const UpcomingEvents = ({ dark }) => {
   const { loading, error, events, message, event, participants } = useSelector(
     (state) => state.events
   );
+  const [eventsLoaded, setEventsLoaded] = useState(false);
 
   useEffect(() => {
-    dispatch(getEvents());
+    const loadingToast = toast.loading("Loading events...");
+    dispatch(getEvents()).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        setEventsLoaded(true);
+      }
+      // Error will be handled by the events error useEffect
+    });
   }, [dispatch, event]);
 
   if (loading) {

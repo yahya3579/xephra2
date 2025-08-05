@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
 import Loading from "./utils/Loading/Loading";
 import RegisterEventDetailUser from "./components/UserDashobard/RegisterEventDetailUser";
@@ -51,6 +52,32 @@ const ChatSystem = lazy(() => import("./components/ChatSystem"));
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: '#4aed88',
+            },
+          },
+          error: {
+            duration: 4000,
+            theme: {
+              primary: '#ff4b4b',
+            },
+          },
+        }}
+      />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<HomeV2 />} />
