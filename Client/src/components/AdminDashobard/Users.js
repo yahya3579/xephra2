@@ -38,12 +38,13 @@ const Users = () => {
   }, [successMessage]);
 
   // Handle errors
+  const { error } = useSelector((state) => state.profile);
+  
   useEffect(() => {
-    const { error } = useSelector((state) => state.profile);
     if (error && !loading) {
       toast.error(error);
     }
-  }, []);
+  }, [error, loading]);
 
   const handleDelete = (user) => {
     setUserToDelete(user);

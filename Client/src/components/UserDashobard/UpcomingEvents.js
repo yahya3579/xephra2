@@ -58,17 +58,7 @@ const TournamentCard = ({
     }
   }, [error, loading]);
 
-  // Show success when events are loaded
-  useEffect(() => {
-    if (eventsLoaded && !loading) {
-      if (events.length > 0) {
-        toast.success(`Loaded ${events.length} events successfully!`);
-      } else {
-        toast.info("No events available at the moment.");
-      }
-      setEventsLoaded(false); // Reset to prevent showing again
-    }
-  }, [eventsLoaded, events.length, loading]);
+
 
   const handleJoin = (_id) => {
     const eventId = _id;
@@ -196,6 +186,18 @@ const UpcomingEvents = ({ dark }) => {
       // Error will be handled by the events error useEffect
     });
   }, [dispatch, event]);
+
+  // Show success when events are loaded
+  useEffect(() => {
+    if (eventsLoaded && !loading) {
+      if (events.length > 0) {
+        toast.success(`Loaded ${events.length} events successfully!`);
+      } else {
+        toast.info("No events available at the moment.");
+      }
+      setEventsLoaded(false); // Reset to prevent showing again
+    }
+  }, [eventsLoaded, events.length, loading]);
 
   if (loading) {
     return <Loading />;

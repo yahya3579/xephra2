@@ -61,12 +61,14 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
   }, []);
 
   // Handle errors from profile actions
+  const { error } = useSelector((state) => state.profile);
+  const { loading } = useSelector((state) => state.profile);
+  
   useEffect(() => {
-    const { error } = useSelector((state) => state.profile);
     if (error && !loading) {
       toast.error(error);
     }
-  }, []);
+  }, [error, loading]);
 
   const settings = {
     dots: false,
