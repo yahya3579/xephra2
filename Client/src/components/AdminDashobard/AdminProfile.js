@@ -136,23 +136,23 @@ const AdminProfile = ({ dark, profile }) => {
   console.log("profileData", profileData);
   return (
     <div
-    className="p-4"
+    className="p-2 sm:p-4"
       // className={`${styles.userProfile} ${
       //   dark ? "bg-[#69363F]" : "bg-[#232122]"
       // }`}
     >
-       <div className="  bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] via-[#D4AD66] to-[#D19F43] p-0 shadow-lg mb-6 relative h-48 rounded-t-xl">
+       <div className="bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] via-[#D4AD66] to-[#D19F43] p-0 shadow-lg mb-6 relative h-48 rounded-t-xl">
         {/* Rank Display */}
         {/* <div className="absolute top-4 right-6 font-montserrat text-white text-3xl font-semibold drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)]">
           Rank: {profileData.rank || 73}
         </div> */}
       
         {/* Profile Image Container */}
-        <div className="absolute -bottom-20 left-10 ">
+        <div className="absolute -bottom-20 left-4 sm:left-6 lg:left-10">
           {/* Camera Icon */}
           <label
               htmlFor="profileImage"
-              className=" z-40 absolute top-0 left-0 bg-[#3028259b] rounded-full p-3 text-white hover:bg-gray-700 transition cursor-pointer"
+              className="z-40 absolute top-0 left-0 bg-[#3028259b] rounded-full p-3 text-white hover:bg-gray-700 transition cursor-pointer"
             >
                <FaCamera className="relative w-6 h-6 text-white" />
               <input
@@ -164,7 +164,7 @@ const AdminProfile = ({ dark, profile }) => {
               />
             </label>
        
-          <div className="relative w-44 h-44 rounded-full bg-[#000000A1] border-[13px]  border-[#0000005e] overflow-hidden">
+          <div className="relative w-44 h-44 rounded-full bg-[#000000A1] border-[13px] border-[#0000005e] overflow-hidden">
             <img
               src={
                 profileImageView
@@ -184,19 +184,19 @@ const AdminProfile = ({ dark, profile }) => {
               <label className="text-[#D4AD66] text-xl ml-10">{profileData.bio}</label>
             </div> */}
       </div>
-      <div className="absolute -bottom-0 left-56 text-2xl font-[Montserrat]">
-    <label className="text-[#622D37] text-3xl font-semibold">{profileData.username}</label>
+      <div className="absolute -bottom-0 left-48 sm:left-52 md:left-56 text-2xl font-[Montserrat]">
+    <label className="text-[#622D37] text-2xl sm:text-3xl font-semibold">{profileData.username}</label>
   </div>
-  <div className="absolute top-48 left-[14.2rem]">
-    <label className="font-[500] text-[#FFFFFF] text-xl">{profileData.bio}</label>
+  <div className="absolute top-48 left-48 sm:left-52 md:left-[14.2rem]">
+    <label className="font-[500] text-[#FFFFFF] text-lg sm:text-xl">{profileData.bio}</label>
   </div>
       </div>
 
       <div className={styles.profileForm}>
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-5 mt-14 sm:ml-4">
+        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 mt-12 sm:mt-14 px-2 sm:px-4">
           {/* Username */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className=" text-[#D4AD66] flex items-center gap-2">
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
               <FaUser /> Username
             </label>
             <input
@@ -204,13 +204,13 @@ const AdminProfile = ({ dark, profile }) => {
               name="username"
               value={profileData?.username || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2  rounded  flex-1`}
+              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
             />
           </div>
 
           {/* Full Name */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2">
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
               <FaUser /> Full Name
             </label>
             <input
@@ -218,26 +218,28 @@ const AdminProfile = ({ dark, profile }) => {
               name="fullName"
               value={profileData?.fullName || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded  flex-1`}
+              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
             />
           </div>
         </div>
 
-        <label className="text-[#D4AD66] sm:ml-4">
-          <FaEnvelope /> Bio/About
-        </label>
-        <textarea
-          name="bio"
-          value={profileData?.bio || ""}
-          onChange={handleChange}
-          className={`${styles.userProfileInput} p-2 rounded  w-90 lg:ml-4 md:ml-4 sm:ml-4`}
-        ></textarea>
+        <div className="px-2 sm:px-4 mt-3 sm:mt-4">
+          <label className="text-[#D4AD66] text-sm sm:text-base">
+            <FaEnvelope /> Bio/About
+          </label>
+          <textarea
+            name="bio"
+            value={profileData?.bio || ""}
+            onChange={handleChange}
+            className={`${styles.userProfileInput} p-2 rounded w-full mt-2 text-sm sm:text-base`}
+            rows="3"
+          ></textarea>
+        </div>
 
-
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-5 sm:ml-4">
+        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 px-2 sm:px-4 mt-3 sm:mt-4">
           {/* Email */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2">
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
               <FaEnvelope /> Email
             </label>
             <input
@@ -245,29 +247,29 @@ const AdminProfile = ({ dark, profile }) => {
               name="email"
               value={profileData?.email || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded  flex-1`}
+              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
             />
           </div>
 
           {/* Phone Number */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2">Phone Number</label>
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">Phone Number</label>
             <input
               type="text"
               name="phoneNumber"
               value={profileData?.phoneNumber || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded  flex-1`}
+              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
             />
           </div>
         </div>
 
         {/* Address Info */}
 
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-5 sm:ml-4">
+        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 px-2 sm:px-4 mt-3 sm:mt-4">
           {/* City */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2">
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
               <FaCity /> City
             </label>
             <input
@@ -275,13 +277,13 @@ const AdminProfile = ({ dark, profile }) => {
               name="locationCity"
               value={profileData?.locationCity || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded  w-full`}
+              className={`${styles.userProfileInput} p-2 rounded w-full text-sm sm:text-base`}
             />
           </div>
 
           {/* Country */}
           <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2">
+            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
               <FaCity /> Country
             </label>
             <input
@@ -289,29 +291,31 @@ const AdminProfile = ({ dark, profile }) => {
               name="locationCountry"
               value={profileData?.locationCountry || ""}
               onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded  w-full`}
+              className={`${styles.userProfileInput} p-2 rounded w-full text-sm sm:text-base`}
             />
           </div>
         </div>
 
-        <label className="text-[#D4AD66] sm:ml-4">Address</label>
-        <input
-          type="text"
-          name="address"
-          value={profileData?.address || ""}
-          onChange={handleChange}
-          className={`${styles.userProfileInput} p-2 rounded  w-90 lg:ml-4 md:ml-4 sm:ml-4 `}
-        />
+        <div className="px-2 sm:px-4 mt-3 sm:mt-4">
+          <label className="text-[#D4AD66] text-sm sm:text-base">Address</label>
+          <input
+            type="text"
+            name="address"
+            value={profileData?.address || ""}
+            onChange={handleChange}
+            className={`${styles.userProfileInput} p-2 rounded w-full mt-2 text-sm sm:text-base`}
+          />
+        </div>
 
        
         {/* Show message if no changes are detected */}
-        {message && <div className={styles.message}>{message}</div>}
+        {message && <div className={`${styles.message} px-2 sm:px-4 text-center mt-4`}>{message}</div>}
 
         {/* Conditionally render the button */}
-        <div className="flex justify-center items-center w-full">
+        <div className="flex justify-center items-center w-full px-2 sm:px-4 mt-6">
         {profile ? (
           <button
-          className={` font-[Poppins] text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-14 py-3 ${
+          className={`font-[Poppins] text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-8 sm:px-12 lg:px-14 py-2 sm:py-3 text-sm sm:text-base ${
             dark
               ? "bg-[#302B27] hover:bg-[#49413C]"
               : "bg-[#302B27] hover:bg-[#A15D66]"
@@ -322,7 +326,7 @@ const AdminProfile = ({ dark, profile }) => {
           </button>
         ) : (
           <button
-             className={` $text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-14 py-3 font-[Poppins]  ${
+             className={`text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-8 sm:px-12 lg:px-14 py-2 sm:py-3 font-[Poppins] text-sm sm:text-base ${
                 dark
                   ? "bg-[#302B27] hover:bg-[#49413C]"
                   : "bg-[#302B27] hover:bg-[#A15D66]"

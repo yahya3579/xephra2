@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const EventSchema = new mongoose.Schema({
   title: { type: String, required: true },
   game: { type: String, required: true },
+  gameMode: { type: String, required: true, enum: ['solo', 'duo', 'squad'] },
   date: { type: String, required: true },
   time: { type: String, required: true },
   description: { type: String, required: true },

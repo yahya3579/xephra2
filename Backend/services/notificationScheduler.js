@@ -19,14 +19,10 @@ class NotificationSchedulerService {
     cron.schedule('0 9 * * *', async () => {
       await this.checkExpiringSubscriptions();
     });
-
-    console.log('Notification scheduler service initialized');
   }
 
   async checkExpiredSubscriptions() {
     try {
-      console.log('Checking for expired subscriptions...');
-      
       const now = new Date();
       const expiredSubscriptions = await Payment.find({
         'paymentStatus.status': 'verified',
@@ -46,12 +42,6 @@ class NotificationSchedulerService {
           subscription._id,
           subscription.userDetails.userId
         );
-
-        console.log(`Subscription ${subscription._id} marked as expired for user ${subscription.userDetails.userId}`);
-      }
-
-      if (expiredSubscriptions.length > 0) {
-        console.log(`Processed ${expiredSubscriptions.length} expired subscriptions`);
       }
     } catch (error) {
       console.error('Error checking expired subscriptions:', error);
@@ -60,8 +50,6 @@ class NotificationSchedulerService {
 
   async checkExpiringSubscriptions() {
     try {
-      console.log('Checking for subscriptions expiring soon...');
-      
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(23, 59, 59, 999);
@@ -97,12 +85,6 @@ class NotificationSchedulerService {
           },
           priority: 'high'
         });
-
-        console.log(`Expiring subscription notification sent to user ${subscription.userDetails.userId}`);
-      }
-
-      if (expiringSubscriptions.length > 0) {
-        console.log(`Sent expiring notifications for ${expiringSubscriptions.length} subscriptions`);
       }
     } catch (error) {
       console.error('Error checking expiring subscriptions:', error);

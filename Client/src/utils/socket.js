@@ -13,18 +13,17 @@ class SocketService {
       });
 
       this.socket.on('connect', () => {
-        console.log('Connected to server');
         if (userId) {
           this.socket.emit('join', userId);
         }
       });
 
       this.socket.on('disconnect', () => {
-        console.log('Disconnected from server');
+        // Handle disconnect
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error);
+        // Handle connection error
       });
     }
     return this.socket;

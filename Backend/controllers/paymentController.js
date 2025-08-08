@@ -756,6 +756,7 @@ updatePendingSubscription: async (req, res) => {
   getSubscriptionStatus: async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log('Checking subscription status for userId:', userId);
 
     if (!userId) {
       return res.status(400).json({
@@ -771,7 +772,10 @@ updatePendingSubscription: async (req, res) => {
       'paymentStatus.isActive': true
     }).sort({ 'paymentStatus.submissionDate': -1 });
 
+    console.log('Subscription found for user:', !!subscription);
+    
     if (subscription) {
+      console.log('User has active subscription');
       return res.status(200).json({
         success: true,
         isVerified: true,
@@ -779,6 +783,7 @@ updatePendingSubscription: async (req, res) => {
         message: "User has a verified and active subscription"
       });
     } else {
+      console.log('User does not have active subscription');
       return res.status(200).json({
         success: true,
         isVerified: false,
@@ -796,6 +801,91 @@ updatePendingSubscription: async (req, res) => {
   }
 },
 
+  // Validate team members' subscription status
+  validateTeamSubscriptions: async (req, res) => {
+    try {
+      const { xephraIds } = req.body;
+      console.log('Validating subscriptions for Xephra IDs:', xephraIds);
+
+      if (!xephraIds || !Array.isArray(xephraIds) || xephraIds.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Xephra IDs array is required and cannot be empty"
+        });
+      }
+
+      // Check subscription status for all members using XephraId
+      const subscriptionChecks = await Promise.all(
+        xephraIds.map(async (xephraId) => {
+          console.log(`Checking subscription for Xephra ID: ${xephraId}`);
+          
+          // Find the user with this XephraId (which is actually userId)
+          const User = require('../models/User');
+          const user = await User.findOne({ 
+            userId: xephraId.trim()
+          });
+
+          if (!user) {
+            console.log(`User not found for Xephra ID: ${xephraId}`);
+            return {
+              xephraId: xephraId.trim(),
+              hasActiveSubscription: false,
+              error: 'User not found'
+            };
+          }
+
+          console.log(`User found: ${user.userId}, checking subscription...`);
+
+          // Check subscription using the user's userId
+          const subscription = await Payment.findOne({
+            'userDetails.userId': user.userId,
+            'paymentStatus.status': 'verified',
+            'paymentStatus.isActive': true
+          }).sort({ 'paymentStatus.submissionDate': -1 });
+
+          console.log(`Subscription found for ${user.userId}:`, !!subscription);
+
+          return {
+            xephraId: xephraId.trim(),
+            userId: user.userId,
+            hasActiveSubscription: !!subscription
+          };
+        })
+      );
+
+      // Find members without active subscriptions
+      const inactiveMembers = subscriptionChecks
+        .filter(check => !check.hasActiveSubscription)
+        .map(check => check.xephraId);
+
+      console.log('Subscription check results:', subscriptionChecks);
+      console.log('Inactive members:', inactiveMembers);
+
+      if (inactiveMembers.length > 0) {
+        console.log('Some members have inactive subscriptions, returning error');
+        return res.status(400).json({
+          success: false,
+          message: `Some team members don't have active subscriptions`,
+          inactiveMembers: inactiveMembers,
+          allChecks: subscriptionChecks
+        });
+      }
+
+      console.log('All members have active subscriptions');
+      return res.status(200).json({
+        success: true,
+        message: "All team members have active subscriptions",
+        allChecks: subscriptionChecks
+      });
+
+    } catch (error) {
+      console.error('Team subscription validation error:', error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error while validating team subscriptions"
+      });
+    }
+  },
 
   getPendingPayments: async (req, res) => {
     try {

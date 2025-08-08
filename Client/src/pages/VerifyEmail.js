@@ -301,8 +301,6 @@ const VerifyEmail = () => {
       hasVerified.current = true;
 
       try {
-        console.log("Verifying token:", token); // Debug log
-        
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND}/auth/verify-email/${token}`,
           {
@@ -314,7 +312,6 @@ const VerifyEmail = () => {
         );
         
         const data = await response.json();
-        console.log("Verification response:", data); // Debug log
 
         setIsLoading(false);
 

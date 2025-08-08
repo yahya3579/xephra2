@@ -1955,17 +1955,13 @@ const PaymentVerificationPanel = () => {
   ];
 
   const paymentMethods = [
-    { value: "hbl", label: "HBL Bank Transfer" },
-    { value: "ubl", label: "UBL Bank Transfer" },
-    { value: "mcb", label: "MCB Bank Transfer" },
-    { value: "jazzcash", label: "JazzCash" },
-    { value: "easypaisa", label: "Easypaisa" },
+    { value: "askari", label: "Askari Bank Limited" },
   ];
 
   const plans = [
-    { value: "weekly", label: "Weekly Plan - PKR 350" },
-    { value: "monthly", label: "Monthly Plan - PKR 999" },
-    { value: "yearly", label: "Yearly Plan - PKR 8,999" },
+    { value: "weekly", label: "Weekly Plan - PKR 749" },
+    { value: "monthly", label: "Monthly Plan - PKR 1,499" },
+    { value: "quarterly", label: "Quarterly Plan - PKR 3,999" },
   ];
 
   return (
@@ -2749,7 +2745,8 @@ const PaymentVerificationPanel = () => {
                             e.target.value
                           )
                         }
-                        className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:border-fuchsia-400"
+                        disabled={true}
+                        className="w-full px-3 py-2 bg-gray-500 border border-gray-500 rounded-md text-gray-300 cursor-not-allowed opacity-60"
                       >
                         <option value="">Select Payment Method</option>
                         {paymentMethods.map((method) => (
@@ -2758,6 +2755,9 @@ const PaymentVerificationPanel = () => {
                           </option>
                         ))}
                       </select>
+                      <div className="text-xs text-gray-400 mt-1">
+                        💡 Payment method cannot be changed (Only Askari Bank Limited is supported)
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">

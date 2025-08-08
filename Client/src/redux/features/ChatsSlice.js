@@ -69,7 +69,6 @@ export const fetchSingleMessages = createAsyncThunk(
   async (chatGroupId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${apiUrl}/user/single-chat/${chatGroupId}`);
-      console.log("from slice",response.data.messages);
       return response.data.messages; // Return only messages array
       
     } catch (error) {

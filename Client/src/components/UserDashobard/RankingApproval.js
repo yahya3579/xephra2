@@ -159,7 +159,6 @@ const RankingApproval = ({ dark }) => {
     );
   }
 
-  console.log("game", game);
   return (
     <div className={`rounded-lg p-6 mx-auto text-center min-h-full shadow-2xl shadow-gray-950 backdrop-blur-sm  ${
         dark
@@ -263,7 +262,7 @@ const RankingApproval = ({ dark }) => {
                   type="number"
                   value={game.rank}
                   onChange={(e) => handleInputChange("rank", e.target.value)}
-                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030]"
+                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030] text-white"
                   placeholder="Enter rank"
                   disabled={game.status !== "-"}
                 />
@@ -273,7 +272,7 @@ const RankingApproval = ({ dark }) => {
                   type="number"
                   value={game.score}
                   onChange={(e) => handleInputChange("score", e.target.value)}
-                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030]"
+                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030] text-white"
                   placeholder="Enter score"
                   disabled={game.status !== "-"}
                 />
@@ -375,7 +374,7 @@ const RankingApproval = ({ dark }) => {
 
                   <div>
                     <button
-                    className="bg-red-300 px-3 py-1 rounded text-white"
+                    className="bg-red-500 px-3 py-1 rounded text-white"
                       onClick={() =>
                         handleDelete(submission.userId, submission.eventId)
                       }

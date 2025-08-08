@@ -12,7 +12,9 @@ const {
   getEventAndUsers,
   markEventAsHosted,
   getEventSubmissions,
-  getTotalEventAndUsers
+  getTotalEventAndUsers,
+  getEventParticipants,
+  getTeamDetails
 } = require("../controllers/admin");
 
 const { authenticateAdmin } = require("../middleware/authMiddleware");
@@ -30,5 +32,7 @@ router.get("/event-users/:eventId", getEventAndUsers);
 router.patch("/events/:eventId/host", authenticateAdmin, markEventAsHosted);
 router.get("/geteventssubmission/:eventId", authenticateAdmin, getEventSubmissions);
 router.get("/gettotalusersandevents", getTotalEventAndUsers);
+router.get("/event-participants/:eventId", authenticateAdmin, getEventParticipants);
+router.get("/team-details/:teamDataId", authenticateAdmin, getTeamDetails);
 
 module.exports = router;

@@ -23,14 +23,31 @@ const RegisterEventDetailUser = () => {
   }, [dispatch, eventId]);
 
   const userId = JSON.parse(localStorage.getItem("user")).UserId;
-  const handleJoin = (_id) => {
+  const handleJoin = async (_id) => {
     const eventId = _id;
     if (!userId) {
       alert("User is not logged in");
       return;
     }
-    dispatch(joinEvent({ userId, eventId }));
-    alert("joined Successfully");
+    
+    try {
+      const joinResult = await dispatch(joinEvent({ userId, eventId }));
+      
+      if (joinEvent.fulfilled.match(joinResult)) {
+        alert("Joined Successfully!");
+      } else {
+        // Handle different error types
+        if (joinResult.payload?.error === "ALREADY_REGISTERED") {
+          alert(joinResult.payload.message || "You have already joined this event!");
+        } else if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
+          alert(joinResult.payload.message || "You must have an active subscription to join events.");
+        } else {
+          alert(joinResult.payload?.message || "Failed to join event. Please try again.");
+        }
+      }
+    } catch (error) {
+      alert("An error occurred while joining the event. Please try again.");
+    }
   };
 
   if (!event) {
@@ -48,7 +65,7 @@ const RegisterEventDetailUser = () => {
     return <Loading />;
   }
   if (error) {
-    console.log("error is", error);
+    // Handle error silently
   }
 
   return (
@@ -64,6 +81,7 @@ const RegisterEventDetailUser = () => {
             Tournament Title : {event?.title}
           </h1>
           <p className="text-[#69363f] font-bold mt-2">Game : {event?.game}</p>
+          <p className="text-[#D4AD66] font-semibold mt-1">Game Mode: {event?.gameMode?.charAt(0).toUpperCase() + event?.gameMode?.slice(1)}</p>
           <p className="text-sm text-gray-400 mt-1">
             Date & Time : {event?.date} • {event?.time}
           </p>

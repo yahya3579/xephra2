@@ -19,8 +19,6 @@ const updateExpiredSubscriptions = async () => {
         }
       }
     );
-
-    console.log(`[Cron] Expired ${result.modifiedCount} subscriptions.`);
   } catch (err) {
     console.error('[Cron] Failed to update subscriptions:', err.message);
   }
@@ -29,7 +27,6 @@ const updateExpiredSubscriptions = async () => {
 // Run every night at 12:00 AM
 const startSubscriptionCron = () => {
   cron.schedule('0 0 * * *', () => {
-    console.log('[Cron] Checking for expired subscriptions...');
     updateExpiredSubscriptions();
   });
 };

@@ -26,8 +26,6 @@ const socketSetup = (server) => {
   const adminSockets = new Set(); // Set of admin socket IDs
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
-    
     // Store user information if provided in the query
     const userId = socket.handshake.query.userId;
     const userType = socket.handshake.query.userType || 'user';
@@ -45,8 +43,6 @@ const socketSetup = (server) => {
         socket.join('admin_dashboard');
         adminSockets.add(socket.id);
       }
-      
-      console.log(`${userType} ${userId} is now online and joined room: ${userRoom}`);
     }
 
     // Handle sending messages
@@ -113,13 +109,11 @@ const socketSetup = (server) => {
     socket.on("joinNotificationRoom", ({ userId, userType }) => {
       const roomName = `${userType}_${userId}`;
       socket.join(roomName);
-      console.log(`Socket ${socket.id} joined notification room: ${roomName}`);
     });
 
     socket.on("leaveNotificationRoom", ({ userId, userType }) => {
       const roomName = `${userType}_${userId}`;
       socket.leave(roomName);
-      console.log(`Socket ${socket.id} left notification room: ${roomName}`);
     });
 
     // Handle marking notification as read in real-time
@@ -148,8 +142,6 @@ const socketSetup = (server) => {
 
     // Handle user disconnection
     socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
-      
       // Clean up when user disconnects
       if (userSockets.has(socket.id)) {
         const { userId, userType } = userSockets.get(socket.id);
@@ -160,8 +152,6 @@ const socketSetup = (server) => {
         if (userType === 'admin') {
           adminSockets.delete(socket.id);
         }
-        
-        console.log(`${userType} ${userId} disconnected`);
       }
     });
   });

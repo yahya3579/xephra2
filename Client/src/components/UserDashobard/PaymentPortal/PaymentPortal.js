@@ -227,15 +227,6 @@ const UserPaymentPortal = () => {
     // Append file with the exact field name backend expects
     submitData.append("paymentReceipt", selectedFile);
 
-    // Debug logging
-    console.log("=== PAYMENT SUBMISSION DEBUG ===");
-    console.log("userDetails:", JSON.stringify(userDetails, null, 2));
-    console.log("selectedPlan:", JSON.stringify(planData, null, 2));
-    console.log("paymentDetails:", JSON.stringify(paymentDetails, null, 2));
-    console.log("file name:", selectedFile.name);
-    console.log("file size:", selectedFile.size);
-    console.log("file type:", selectedFile.type);
-
     try {
       await dispatch(submitPayment(submitData)).unwrap();
       // Success handled by Redux state

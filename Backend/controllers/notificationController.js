@@ -352,14 +352,10 @@ const getNotifications = async (req, res) => {
   try {
     const { userId, userType = 'user', page = 1, limit = 20, unreadOnly = false } = req.query;
     
-    console.log('getNotifications called with:', { userId, userType, page, limit, unreadOnly });
-    
     const query = {
       recipientId: userId || 'admin', // Use 'admin' as default for admin requests
       recipientType: userType
     };
-    
-    console.log('Database query:', query);
     
     if (unreadOnly === 'true') {
       query.isRead = false;
@@ -380,8 +376,6 @@ const getNotifications = async (req, res) => {
       recipientType: userType,
       isRead: false
     });
-
-    console.log(`Found ${notifications.length} notifications, ${unreadCount} unread`);
 
     res.json({
       success: true,

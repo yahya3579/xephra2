@@ -9,6 +9,7 @@ const NewEvents = ({ setActiveMenu, dark }) => {
   const [formData, setFormData] = useState({
     title: "",
     game: "",
+    gameMode: "",
     date: "",
     time: "",
     description: "",
@@ -38,6 +39,7 @@ const NewEvents = ({ setActiveMenu, dark }) => {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("title", formData.title);
     formDataToSubmit.append("game", formData.game);
+    formDataToSubmit.append("gameMode", formData.gameMode);
     formDataToSubmit.append("date", formData.date);
     formDataToSubmit.append("time", formData.time);
     formDataToSubmit.append("description", formData.description);
@@ -58,6 +60,7 @@ const NewEvents = ({ setActiveMenu, dark }) => {
     setFormData({
       title: "",
       game: "",
+      gameMode: "",
       date: "",
       time: "",
       description: "",
@@ -107,6 +110,26 @@ const NewEvents = ({ setActiveMenu, dark }) => {
               className="p-2 rounded-md bg-[#00000082] text-white"
               required
             />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-[#D4AD66] ml-1 pb-2">Game Mode</label>
+            <select
+              name="gameMode"
+              value={formData.gameMode}
+              onChange={handleChange}
+              className="p-2 rounded-md bg-[#00000082] text-white"
+              style={{
+                backgroundColor: '#00000082',
+                color: 'white'
+              }}
+              required
+            >
+              <option value="" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Select Game Mode</option>
+              <option value="solo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Solo</option>
+              <option value="duo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Duo</option>
+              <option value="squad" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Squad</option>
+            </select>
           </div>
         </div>
 

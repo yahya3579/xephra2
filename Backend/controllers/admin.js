@@ -5,6 +5,7 @@ const path = require("path");
 const Profile = require("../models/AdminProfile");
 const User = require("../models/User");
 const Participant = require("../models/Participant");
+const TeamData = require("../models/TeamData");
 const { default: mongoose } = require("mongoose");
 const UserSubmission = require("../models/UserSubmission");
 const UserProfile = require("../models/UserProfile");
@@ -17,12 +18,13 @@ const {
 
 exports.newEvent = async (req, res) => {
   try {
-    const { title, game, date, time, description, prizePool, rules, adminId  } = req.body;
+    const { title, game, gameMode, date, time, description, prizePool, rules, adminId  } = req.body;
     const image = req.file ? `uploads/${req.file.filename}` : null;
 
     if (
       !title ||
       !game ||
+      !gameMode ||
       !date ||
       !time ||
       !description ||
@@ -48,6 +50,7 @@ exports.newEvent = async (req, res) => {
     const newEvent = new Events({
       title,
       game,
+      gameMode,
       date,
       time,
       description,
@@ -351,22 +354,61 @@ exports.getEventAndUsers = async (req, res) => {
         $unwind: "$userDetails",
       },
       {
+        $lookup: {
+          from: "teamdatas",
+          localField: "teamData",
+          foreignField: "_id",
+          as: "teamInfo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$teamInfo",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "userprofiles",
+          localField: "userId",
+          foreignField: "userId",
+          as: "profileDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$profileDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
         $project: {
           _id: 0,
           userId: 1,
           registeredAt: 1,
           name: "$userDetails.name",
+          email: "$userDetails.email",
+          teamType: "$teamInfo.teamType",
+          teamName: "$teamInfo.teamName",
+          leaderInfo: "$teamInfo.leaderInfo",
+          teamMembers: "$teamInfo.teamMembers",
+          profilePicture: "$profileDetails.profilePicture",
+          gamingProfile: "$profileDetails.gamingProfile",
         },
       },
+      {
+        $sort: { registeredAt: 1 }
+      }
     ]);
 
     res.status(200).json({
       participantsData,
+      totalParticipants: participantsData.length
     });
   } catch (error) {
     console.error("Error fetching event participants:", error);
     res.status(500).json({
-      error,
+      error: error.message || "Failed to fetch event participants",
     });
   }
 };
@@ -492,6 +534,147 @@ exports.getTotalEventAndUsers = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// Get all participants for an event with team data
+exports.getEventParticipants = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        message: "Invalid eventId format",
+      });
+    }
+
+    // Get participants with populated team data and user profile
+    const participants = await Participant.find({ eventId })
+      .populate('teamData')
+      .populate('eventId', 'title game gameMode')
+      .sort({ registeredAt: -1 });
+
+    if (!participants.length) {
+      return res.status(404).json({
+        message: "No participants found for this event",
+      });
+    }
+
+    // Enhance data with user profiles
+    const participantsWithProfiles = await Promise.all(
+      participants.map(async (participant) => {
+        const userProfile = await UserProfile.findOne({ 
+          userId: participant.userId 
+        }).select('username fullName profileImage email phoneNumber');
+
+        return {
+          participantId: participant._id,
+          userId: participant.userId,
+          registeredAt: participant.registeredAt,
+          userProfile: userProfile || null,
+          teamData: participant.teamData,
+          event: participant.eventId
+        };
+      })
+    );
+
+    // Group by team type for better display
+    const groupedByTeamType = participantsWithProfiles.reduce((acc, participant) => {
+      if (participant.teamData) {
+        const teamType = participant.teamData.teamType;
+        if (!acc[teamType]) {
+          acc[teamType] = [];
+        }
+        acc[teamType].push(participant);
+      }
+      return acc;
+    }, {});
+
+    // Summary statistics
+    const summary = {
+      totalParticipants: participants.length,
+      soloTeams: groupedByTeamType.solo?.length || 0,
+      duoTeams: groupedByTeamType.duo?.length || 0,
+      squadTeams: groupedByTeamType.squad?.length || 0,
+      totalPlayers: participants.reduce((total, p) => {
+        if (p.teamData) {
+          const teamSize = p.teamData.teamType === 'solo' ? 1 :
+                          p.teamData.teamType === 'duo' ? 2 :
+                          p.teamData.teamType === 'squad' ? 4 : 1;
+          return total + teamSize;
+        }
+        return total + 1;
+      }, 0)
+    };
+
+    res.status(200).json({
+      message: "Participants retrieved successfully",
+      summary,
+      participants: participantsWithProfiles,
+      groupedByTeamType
+    });
+
+  } catch (error) {
+    console.error('Get event participants error:', error);
+    res.status(500).json({
+      message: "Error retrieving participants",
+      error: error.message
+    });
+  }
+};
+
+// Get detailed team information
+exports.getTeamDetails = async (req, res) => {
+  try {
+    const { teamDataId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(teamDataId)) {
+      return res.status(400).json({
+        message: "Invalid teamDataId format",
+      });
+    }
+
+    const teamData = await TeamData.findById(teamDataId);
+    
+    if (!teamData) {
+      return res.status(404).json({
+        message: "Team data not found",
+      });
+    }
+
+    // Get leader profile
+    const leaderProfile = await UserProfile.findOne({ 
+      userId: teamData.leaderInfo.xephraId 
+    }).select('username fullName profileImage email');
+
+    // Get team members profiles
+    const memberProfiles = await Promise.all(
+      teamData.teamMembers.map(async (member) => {
+        const profile = await UserProfile.findOne({ 
+          userId: member.xephraId 
+        }).select('username fullName profileImage email');
+        return {
+          ...member.toObject(),
+          profile: profile || null
+        };
+      })
+    );
+
+    res.status(200).json({
+      message: "Team details retrieved successfully",
+      teamData: {
+        ...teamData.toObject(),
+        leaderProfile: leaderProfile || null,
+        teamMembersWithProfiles: memberProfiles
+      }
+    });
+
+  } catch (error) {
+    console.error('Get team details error:', error);
+    res.status(500).json({
+      message: "Error retrieving team details",
+      error: error.message
+    });
   }
 };
 
