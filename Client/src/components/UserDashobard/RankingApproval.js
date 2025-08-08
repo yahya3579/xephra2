@@ -9,6 +9,7 @@ import {
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../utils/Loading/Loading";
+import toast from 'react-hot-toast';
 
 const RankingApproval = ({ dark }) => {
   const dispatch = useDispatch();
@@ -65,7 +66,7 @@ const RankingApproval = ({ dark }) => {
   const handleSubmit = () => {
     // Check subscription before allowing submission
     if (!subscriptionStatus?.isActive) {
-      alert("You need an active subscription to submit game entries.");
+      toast.error("You need an active subscription to submit game entries.");
       return;
     }
 

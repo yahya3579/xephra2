@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getEventById, joinEvent, saveTeamData, getEventsByUserId } from "../../redux/features/eventsSlice";
+import { getEventById, joinEvent, saveTeamData, getEventsByUserId, clearError } from "../../redux/features/eventsSlice";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import Loading from "../../utils/Loading/Loading";
 import { useState } from "react";
+import toast from 'react-hot-toast';
 
 const EventDetailUser = () => {
   const dispatch = useDispatch();
@@ -61,6 +62,8 @@ const EventDetailUser = () => {
 
   useEffect(() => {
     if (eventId) {
+      // Clear any previous errors when component mounts
+      dispatch(clearError());
       dispatch(getEventById(eventId));
     }
   }, [dispatch, eventId]);
@@ -69,7 +72,7 @@ const EventDetailUser = () => {
   const handleJoin = async (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
 
@@ -93,21 +96,21 @@ const EventDetailUser = () => {
       const joinResult = await dispatch(joinEvent({ userId, eventId }));
       
       if (joinEvent.fulfilled.match(joinResult)) {
-        alert("Joined Successfully!");
+        toast.success("Joined Successfully!");
         // Refresh user's registered events
         dispatch(getEventsByUserId(userId));
       } else {
         // Handle different error types
         if (joinResult.payload?.error === "ALREADY_REGISTERED") {
-          alert(joinResult.payload.message || "You have already joined this event!");
+          toast.error(joinResult.payload.message || "You have already joined this event!");
         } else if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
-          alert(joinResult.payload.message || "You must have an active subscription to join events.");
+          toast.error(joinResult.payload.message || "You must have an active subscription to join events.");
         } else {
-          alert(joinResult.payload?.message || "Failed to join event. Please try again.");
+          toast.error(joinResult.payload?.message || "Failed to join event. Please try again.");
         }
       }
     } catch (error) {
-      alert("An error occurred while joining the event. Please try again.");
+      toast.error("An error occurred while joining the event. Please try again.");
     }
   };
 
@@ -260,16 +263,16 @@ const EventDetailUser = () => {
       }));
       
       if (saveTeamData.fulfilled.match(teamDataResult)) {
-        alert("Joined Successfully!");
+        toast.success("Joined Successfully!");
         dispatch(getEventsByUserId(userId));
       } else {
         // Check if it's a subscription error
         if (teamDataResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
           const errorMsg = teamDataResult.payload.message || "You must have an active subscription to join events.";
           setValidationError(errorMsg);
-          alert(errorMsg);
+          toast.error(errorMsg);
         } else {
-          alert(teamDataResult.payload?.message || "Failed to save team data. Please try again.");
+          toast.error(teamDataResult.payload?.message || "Failed to save team data. Please try again.");
         }
         setValidationLoading(false);
         return;
@@ -279,11 +282,11 @@ const EventDetailUser = () => {
       if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
         const errorMsg = joinResult.payload.message || "You must have an active subscription to join events.";
         setValidationError(errorMsg);
-        alert(errorMsg);
+        toast.error(errorMsg);
       } else if (joinResult.payload?.error === "ALREADY_REGISTERED") {
-        alert(joinResult.payload.message || "You have already joined this event!");
+        toast.error(joinResult.payload.message || "You have already joined this event!");
       } else {
-        alert(joinResult.payload?.message || "Failed to join event. Please try again.");
+        toast.error(joinResult.payload?.message || "Failed to join event. Please try again.");
       }
       setValidationLoading(false);
       return; // Don't proceed if join failed

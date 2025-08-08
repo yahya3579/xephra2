@@ -171,7 +171,14 @@ const eventsSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearMessage: (state) => {
+      state.message = "";
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createEvent.pending, (state) => {
@@ -300,6 +307,7 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchHostedTournaments.pending, (state) => {
         state.loading = true;
+        state.error = null; // Clear any previous errors
       })
       .addCase(fetchHostedTournaments.fulfilled, (state, action) => {
         state.loading = false;
@@ -312,4 +320,5 @@ const eventsSlice = createSlice({
   },
 });
 
+export const { clearError, clearMessage } = eventsSlice.actions;
 export default eventsSlice.reducer;

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHostedTournaments } from "../../redux/features/eventsSlice";
+import { fetchHostedTournaments, clearError } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 
 const CompletedEvents = ({ dark }) => {
@@ -9,6 +9,8 @@ const CompletedEvents = ({ dark }) => {
   const { hostedEvents, loading, error } = useSelector((state) => state.events);
 
   useEffect(() => {
+    // Clear any previous errors when component mounts
+    dispatch(clearError());
     dispatch(fetchHostedTournaments());
   }, [dispatch]);
 

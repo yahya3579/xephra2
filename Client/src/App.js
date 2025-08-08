@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import socketService from "./utils/socket";
+import { Toaster } from 'react-hot-toast';
 
 import Loading from "./utils/Loading/Loading";
 import RegisterEventDetailUser from "./components/UserDashobard/RegisterEventDetailUser";
@@ -197,6 +198,16 @@ export default function App() {
           />
         </Routes>
       </Suspense>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
     </BrowserRouter>
   );
 }

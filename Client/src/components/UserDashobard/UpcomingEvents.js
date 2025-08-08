@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getEvents, joinEvent, saveTeamData, getEventsByUserId } from "../../redux/features/eventsSlice";
+import { getEvents, joinEvent, saveTeamData, getEventsByUserId, clearError } from "../../redux/features/eventsSlice";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from 'react-hot-toast';
 
 const TournamentCard = ({
   _id,
@@ -67,13 +68,13 @@ const TournamentCard = ({
   const handleJoin = async (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
 
     // Check if user is already registered for this event
     if (isUserRegistered) {
-      alert("You have already joined this event!");
+      toast.error("You have already joined this event!");
       return;
     }
 
@@ -92,7 +93,7 @@ const TournamentCard = ({
       const result = await response.json();
       
       if (!response.ok || !result.success) {
-        alert('Failed to validate subscription status. Please try again.');
+        toast.error('Failed to validate subscription status. Please try again.');
         return;
       }
       
@@ -100,13 +101,13 @@ const TournamentCard = ({
       if (result.inactiveMembers && result.inactiveMembers.length > 0) {
         const isUserInactive = result.inactiveMembers.includes(userXephraId);
         if (isUserInactive) {
-          alert(`Your subscription is not active (Xephra ID: ${userXephraId}). Please activate your subscription to join events.`);
+          toast.error(`Your subscription is not active (Xephra ID: ${userXephraId}). Please activate your subscription to join events.`);
           return;
         }
       }
     } catch (error) {
       console.error('Subscription validation error:', error);
-      alert('Failed to validate subscription. Please try again.');
+      toast.error('Failed to validate subscription. Please try again.');
       return;
     }
 
@@ -296,7 +297,7 @@ const TournamentCard = ({
       }));
       
       if (saveTeamData.fulfilled.match(teamDataResult)) {
-        alert("Team registration successful!");
+        toast.success("Team registration successful!");
         // Refresh registered events to update UI
         dispatch(getEventsByUserId(userId));
       } else {
@@ -305,11 +306,11 @@ const TournamentCard = ({
           // Use the detailed message from backend
           const errorMsg = teamDataResult.payload.message || teamDataResult.payload.details || "Some team members don't have active subscriptions.";
           setValidationError(errorMsg);
-          alert(errorMsg);
+          toast.error(errorMsg);
         } else {
           const errorMsg = teamDataResult.payload?.message || 'Failed to save team data';
           setValidationError(errorMsg);
-          alert(errorMsg);
+          toast.error(errorMsg);
         }
         setValidationLoading(false);
         return;
@@ -319,17 +320,17 @@ const TournamentCard = ({
       if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
         const errorMsg = joinResult.payload.message || "You must have an active subscription to join events.";
         setValidationError(errorMsg);
-        alert(errorMsg);
+        toast.error(errorMsg);
       } else if (joinResult.payload?.error === "ALREADY_REGISTERED") {
         const errorMsg = joinResult.payload.message || "You have already joined this event!";
         setValidationError(errorMsg);
-        alert(errorMsg);
+        toast.error(errorMsg);
         // Refresh registered events to update UI
         dispatch(getEventsByUserId(userId));
       } else {
         const errorMsg = joinResult.payload?.message || 'Failed to join event';
         setValidationError(errorMsg);
-        alert(errorMsg);
+        toast.error(errorMsg);
       }
       setValidationLoading(false);
       return; // Don't proceed if join failed
@@ -782,6 +783,8 @@ const UpcomingEvents = ({ dark }) => {
   };
 
   useEffect(() => {
+    // Clear any previous errors when component mounts
+    dispatch(clearError());
     dispatch(getEvents());
     // Fetch user's registered events to check registration status
     try {

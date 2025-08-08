@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getEventById, joinEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from 'react-hot-toast';
 
 const RegisterEventDetailUser = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ const RegisterEventDetailUser = () => {
   const handleJoin = async (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
     
@@ -34,19 +35,19 @@ const RegisterEventDetailUser = () => {
       const joinResult = await dispatch(joinEvent({ userId, eventId }));
       
       if (joinEvent.fulfilled.match(joinResult)) {
-        alert("Joined Successfully!");
+        toast.success("Joined Successfully!");
       } else {
         // Handle different error types
         if (joinResult.payload?.error === "ALREADY_REGISTERED") {
-          alert(joinResult.payload.message || "You have already joined this event!");
+          toast.error(joinResult.payload.message || "You have already joined this event!");
         } else if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
-          alert(joinResult.payload.message || "You must have an active subscription to join events.");
+          toast.error(joinResult.payload.message || "You must have an active subscription to join events.");
         } else {
-          alert(joinResult.payload?.message || "Failed to join event. Please try again.");
+          toast.error(joinResult.payload?.message || "Failed to join event. Please try again.");
         }
       }
     } catch (error) {
-      alert("An error occurred while joining the event. Please try again.");
+      toast.error("An error occurred while joining the event. Please try again.");
     }
   };
 
