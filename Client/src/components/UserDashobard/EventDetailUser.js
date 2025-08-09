@@ -54,7 +54,7 @@ const EventDetailUser = () => {
   }, []);
 
   // Check subscription status when component mounts
-    useEffect(() => {
+  useEffect(() => {
       if (userId) {
         dispatch(getSubscriptionStatus(userId));
       }

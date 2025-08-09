@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Modal from "./Modal";
 import { getTopRanking } from "../../redux/features/rankingSlice";
 import { gettotaluserandevents } from "../../redux/features/profileSlice";
+import toast from "react-hot-toast";
 
 // Register necessary Chart.js components
 ChartJS.register(
@@ -48,6 +49,8 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
   const { topranks } = useSelector((state) => state.ranking);
   const { userCount, eventCount } = useSelector((state) => state.profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     dispatch(getEvents());
@@ -56,6 +59,16 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
     dispatch(gettotaluserandevents());
     dispatch(fetchHostedTournaments());
   }, []);
+
+  // Handle errors from profile actions
+  const { error } = useSelector((state) => state.profile);
+  const { loading } = useSelector((state) => state.profile);
+  
+  useEffect(() => {
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [error, loading]);
 
   const settings = {
     dots: false,
@@ -145,11 +158,47 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
   };
 
 
-  const handleDelete = (userId) => {
-    dispatch(deleteUser(userId));
+  const handleDelete = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
   };
-  const handleSuspend = (userId) => {
-    dispatch(suspendUser(userId));
+
+  const confirmDelete = () => {
+    if (!userToDelete) return;
+    
+    const loadingToast = toast.loading("Deleting user...");
+    
+    dispatch(deleteUser(userToDelete.userId)).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        toast.success("User deleted successfully!");
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      }
+      // Error will be handled by useEffect below
+    });
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setUserToDelete(null);
+    toast.info("Delete cancelled");
+  };
+
+  const handleSuspend = (user) => {
+    const action = user.isSuspended ? "unsuspending" : "suspending";
+    const loadingToast = toast.loading(`${action} user...`);
+    
+    dispatch(suspendUser(user.userId)).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        const message = user.isSuspended 
+          ? "User unsuspended successfully!" 
+          : "User suspended successfully!";
+        toast.success(message);
+      }
+      // Error will be handled by useEffect below
+    });
   };
   const handleProfileView = (userId) => {
     dispatch(getUser(userId));
@@ -524,7 +573,7 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
                     <td className="p-2">
                       <button
                         className="bg-[#854951] hover:bg-[#A15D66] text-white py-1 px-4 rounded mr-2"
-                        onClick={() => handleSuspend(user?.userId)}
+                        onClick={() => handleSuspend(user)}
                       >
                         {user.isSuspended ? "Unsuspend" : "Suspend"}
                       </button>
@@ -532,7 +581,7 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
                     <td className="p-2">
                       <button
                         className="bg-[#cf2c2c] hover:bg-[#aa2a2a] text-white py-1 px-4 rounded"
-                        onClick={() => handleDelete(user?.userId)}
+                        onClick={() => handleDelete(user)}
                       >
                         Delete
                       </button>
@@ -543,6 +592,38 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
             </table>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && userToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-[#232122] p-6 rounded-lg shadow-lg max-w-md mx-4">
+              <h2 className="text-lg font-bold mb-4 text-white">
+                Confirm Deletion
+              </h2>
+              <p className="text-white mb-6">
+                Are you sure you want to delete "{userToDelete.name}"?
+              </p>
+              <p className="text-gray-300 text-sm mb-6">
+                This action cannot be undone. All user data will be permanently removed.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={cancelDelete}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <Modal isOpen={isModalOpen} onClose={closeModal} profile={profile} />
       </div>
     </div>

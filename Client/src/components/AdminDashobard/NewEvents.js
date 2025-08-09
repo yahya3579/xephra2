@@ -34,6 +34,7 @@ const NewEvents = ({ setActiveMenu, dark }) => {
     });
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formDataToSubmit = new FormData();
@@ -68,8 +69,6 @@ const NewEvents = ({ setActiveMenu, dark }) => {
       prizePool: "",
       rules: "",
     });
-
-    // setActiveMenu("postedEvents");
   };
   if (loading) {
     return <Loading />;

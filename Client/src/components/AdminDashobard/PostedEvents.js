@@ -4,6 +4,7 @@ import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Import icons
 import { useSelector, useDispatch } from "react-redux";
 import { getEvents, deleteEventById , editEvent} from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from "react-hot-toast";
 
 const PostedEvents = ({ setActiveMenu, dark }) => {
   const dispatch = useDispatch();
@@ -13,33 +14,83 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
   const isAdmin = true;
 
   useEffect(() => {
-    dispatch(getEvents());
+    const loadingToast = toast.loading("Loading events...");
+    dispatch(getEvents()).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        toast.success("Events loaded successfully!");
+      }
+      // Error will be handled by useEffect below
+    });
   }, [dispatch , event]);
 
 
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
 
   const changeMenu = () => {
     setActiveMenu("newEvents");
   };
 
-  const DeleteEvent = (id) => {
-    dispatch(deleteEventById(id));
+  const DeleteEvent = (tournament) => {
+    setEventToDelete(tournament);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (!eventToDelete) return;
+    
+    const loadingToast = toast.loading("Deleting event...");
+    
+    dispatch(deleteEventById(eventToDelete._id)).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        toast.success("Event deleted successfully!");
+        setShowDeleteModal(false);
+        setEventToDelete(null);
+      }
+      // Error will be handled by useEffect above
+    });
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setEventToDelete(null);
+    toast.info("Delete cancelled");
   };
 
   const onEdit = (tournament) => {
     setSelectedTournament(tournament);
     setShowEditModal(true);
+    toast.success(`Editing "${tournament.title}"`);
   };
+
+  // Handle success and error messages
+  useEffect(() => {
+    if (message && !loading) {
+      toast.success(message);
+    }
+    if (error && !loading) {
+      toast.error(error);
+    }
+  }, [message, error, loading]);
 
   const saveEdit = (updatedTournament) => {
     const id = updatedTournament._id;
-    dispatch(editEvent({id, updatedData :updatedTournament}));
-    console.log("here edit", updatedTournament);
-    setShowEditModal(false);
-    setSelectedTournament(null);
+    const loadingToast = toast.loading("Updating event...");
+    
+    dispatch(editEvent({id, updatedData :updatedTournament})).then((result) => {
+      toast.dismiss(loadingToast);
+      if (result.meta.requestStatus === 'fulfilled') {
+        toast.success("Event updated successfully!");
+        setShowEditModal(false);
+        setSelectedTournament(null);
+      }
+      // Error will be handled by useEffect above
+    });
   };
   if (loading) {
     return <Loading />;
@@ -108,7 +159,17 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
                   <FaEdit />
                 </button>
                 <button
-                  onClick={() => DeleteEvent(_id)}
+                  onClick={() => DeleteEvent({
+                    _id,
+                    title,
+                    game,
+                    date,
+                    time,
+                    description,
+                    image,
+                    prizePool,
+                    rules,
+                  })}
                   className="text-[#b8a896] hover:text-[#8f404f]"
                 >
                   <FaTrash />
@@ -305,7 +366,11 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
            </div>
            <div className="flex justify-end space-x-2">
              <button
-               onClick={() => setShowEditModal(false)}
+               onClick={() => {
+                 setShowEditModal(false);
+                 setSelectedTournament(null);
+                 toast.info("Edit cancelled");
+               }}
                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
              >
                Cancel
@@ -326,6 +391,39 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
      </div>
      
       
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && eventToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`p-6 rounded-lg shadow-lg max-w-md mx-4 ${
+            dark ? "bg-[#69363F]" : "bg-[#232122]"
+          }`}>
+            <h2 className="text-lg font-bold mb-4 text-white">
+              Confirm Deletion
+            </h2>
+            <p className="text-white mb-6">
+              Are you sure you want to delete "{eventToDelete.title}"?
+            </p>
+            <p className="text-gray-300 text-sm mb-6">
+              This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
