@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getEventById, joinEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
+import toast from 'react-hot-toast';
 
 const EventDetailUserDashboard = () => {
   const dispatch = useDispatch();
@@ -23,14 +24,31 @@ const EventDetailUserDashboard = () => {
   }, [dispatch, eventId]);
 
   const userId = JSON.parse(localStorage.getItem("user")).UserId;
-  const handleJoin = (_id) => {
+  const handleJoin = async (_id) => {
     const eventId = _id;
     if (!userId) {
-      alert("User is not logged in");
+      toast.error("User is not logged in");
       return;
     }
-    dispatch(joinEvent({ userId, eventId }));
-    alert("joined Successfully");
+    
+    try {
+      const joinResult = await dispatch(joinEvent({ userId, eventId }));
+      
+      if (joinEvent.fulfilled.match(joinResult)) {
+        toast.success("Joined Successfully!");
+      } else {
+        // Handle different error types
+        if (joinResult.payload?.error === "ALREADY_REGISTERED") {
+          toast.error(joinResult.payload.message || "You have already joined this event!");
+        } else if (joinResult.payload?.error === "SUBSCRIPTION_REQUIRED") {
+          toast.error(joinResult.payload.message || "You must have an active subscription to join events.");
+        } else {
+          toast.error(joinResult.payload?.message || "Failed to join event. Please try again.");
+        }
+      }
+    } catch (error) {
+      toast.error("An error occurred while joining the event. Please try again.");
+    }
   };
 
   if (!event) {
@@ -64,6 +82,7 @@ const EventDetailUserDashboard = () => {
             Tournament Title : {event?.title}
           </h1>
           <p className="text-[#69363f] font-bold mt-2">Game : {event?.game}</p>
+          <p className="text-[#D4AD66] font-semibold mt-1">Game Mode: {event?.gameMode?.charAt(0).toUpperCase() + event?.gameMode?.slice(1)}</p>
           <p className="text-sm text-gray-400 mt-1">
             Date & Time : {event?.date} • {event?.time}
           </p>

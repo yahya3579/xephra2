@@ -47,10 +47,8 @@ export const updateProfile = createAsyncThunk(
           headers: { "Content-Type": "multipart/form-data" },
         }, { withCredentials: true }
       );
-      console.log("Update Response:", response.data);
       return response.data;
     } catch (error) {
-      console.log("Error:", error.response?.data || error);
       return rejectWithValue(error.response?.data || "An error occurred");
     }
   }

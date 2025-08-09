@@ -3,12 +3,14 @@ const User = require("../models/User");
 const Events = require("../models/Events");
 const { default: mongoose } = require("mongoose");
 const Participant = require("../models/Participant");
+const TeamData = require("../models/TeamData");
 const ChatGroup = require("../models/ChatGroup");
 const MessageModel = require("../models/Message");
 const AdminChat = require("../models/AdminChatGroup");
 const AdminMessageModel = require("../models/AdminMessage");
 const AdminMessage = require("../models/AdminMessage");
 const UserEventStats = require('../models/userEventStats');
+const { notifyUserRegisteredEvent } = require("../utils/notificationHelpers");
 // POST: Create a new user profile
 exports.createProfile = async (req, res) => {
   const {
@@ -340,9 +342,29 @@ exports.upcomingEvents = async (req, res) => {
 exports.joinEvent = async (req, res) => {
   try {
     const { userId, eventId } = req.body;
+    
+    console.log('Join event request for userId:', userId);
+    
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
       return res.status(400).json({
         message: "Invalid eventId format",
+      });
+    }
+
+    // MANDATORY: Check if user has active subscription before allowing to join
+    const Payment = require("../models/Payment");
+    const subscription = await Payment.findOne({
+      'userDetails.userId': userId,
+      'paymentStatus.status': 'verified',
+      'paymentStatus.isActive': true
+    }).sort({ 'paymentStatus.submissionDate': -1 });
+
+    console.log('Subscription check for userId:', userId, 'Result:', !!subscription);
+
+    if (!subscription) {
+      return res.status(403).json({
+        message: "You must have an active subscription to join events. Please activate your subscription first.",
+        error: "SUBSCRIPTION_REQUIRED"
       });
     }
 
@@ -352,13 +374,42 @@ exports.joinEvent = async (req, res) => {
     });
 
     if (existingParticipant) {
-      return res.status(400).json({
-        message: "User already registered for this event!",
+      console.log('User already registered for event:', userId, eventId);
+      return res.status(409).json({
+        message: "You have already joined this event! You cannot join the same event multiple times.",
+        error: "ALREADY_REGISTERED"
       });
     }
 
-    const participant = new Participant({ userId, eventId });
+    // Create default/placeholder team data that will be updated later
+    const defaultTeamData = new TeamData({
+      eventId,
+      userId,
+      teamType: 'solo', // default type
+      teamName: null,
+      leaderInfo: {
+        xephraId: userId,
+        gamerId: '',
+        gamerTag: '',
+        phoneNumber: ''
+      },
+      teamMembers: []
+    });
+
+    console.log('Creating TeamData with:', defaultTeamData);
+    const savedTeamData = await defaultTeamData.save();
+    console.log('TeamData saved successfully:', savedTeamData._id);
+
+    // Then create participant with team data reference
+    const participant = new Participant({ 
+      userId, 
+      eventId,
+      teamData: savedTeamData._id
+    });
+    console.log('Creating Participant with:', participant);
     await participant.save();
+    console.log('Participant saved successfully:', participant._id);
+
     const event = await Events.findById(eventId);
     console.log(event);
     if (!event || !event.chatGroupId) {
@@ -384,13 +435,298 @@ exports.joinEvent = async (req, res) => {
       await chatGroup.save();
     }
 
+    // Send notification to admin about user registration
+    try {
+      const userData = await User.findOne({ userId });
+      await notifyUserRegisteredEvent(participant, event, userData);
+    } catch (notificationError) {
+      console.error('Error sending user registration notification:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+
     res.status(201).json({
       message: "User registered successfully and added to chat group",
-      participant,
+      participant
     });
   } catch (error) {
+    console.error('Error in joinEvent:', error);
     res.status(500).json({
-      error,
+      message: "An error occurred while joining the event",
+      error: error.message || error,
+    });
+  }
+};
+
+// Get team data for a participant
+exports.getTeamData = async (req, res) => {
+  try {
+    const { userId, eventId } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        message: "Invalid eventId format",
+      });
+    }
+
+    const participant = await Participant.findOne({ userId, eventId }).populate('teamData');
+    
+    if (!participant) {
+      return res.status(404).json({
+        message: "Participant not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Team data retrieved successfully",
+      teamData: participant.teamData
+    });
+  } catch (error) {
+    console.error('Get team data error:', error);
+    res.status(500).json({
+      message: "Error retrieving team data",
+      error: error.message
+    });
+  }
+};
+
+// Update team data
+exports.updateTeamData = async (req, res) => {
+  try {
+    const { teamDataId } = req.params;
+    const { teamData } = req.body;
+    
+    if (!mongoose.Types.ObjectId.isValid(teamDataId)) {
+      return res.status(400).json({
+        message: "Invalid teamDataId format",
+      });
+    }
+
+    if (!teamData) {
+      return res.status(400).json({
+        message: "Team data is required",
+      });
+    }
+
+    // Validate team structure based on type
+    const { teamType, teamMembers } = teamData;
+    
+    if (teamType === 'solo' && teamMembers && teamMembers.length > 0) {
+      return res.status(400).json({
+        message: "Solo teams should not have additional members",
+      });
+    }
+    if (teamType === 'duo' && (!teamMembers || teamMembers.length !== 1)) {
+      return res.status(400).json({
+        message: "Duo teams must have exactly 1 additional member",
+      });
+    }
+    if (teamType === 'squad' && (!teamMembers || teamMembers.length !== 3)) {
+      return res.status(400).json({
+        message: "Squad teams must have exactly 3 additional members",
+      });
+    }
+
+    const updatedTeamData = await TeamData.findByIdAndUpdate(
+      teamDataId,
+      teamData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTeamData) {
+      return res.status(404).json({
+        message: "Team data not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Team data updated successfully",
+      teamData: updatedTeamData
+    });
+  } catch (error) {
+    console.error('Update team data error:', error);
+    res.status(500).json({
+      message: "Error updating team data",
+      error: error.message
+    });
+  }
+};
+
+// Save team data for a participant (separate from joining event)
+exports.saveTeamData = async (req, res) => {
+  try {
+    const { eventId, teamData } = req.body;
+    const userId = req.body.userId || req.user?.userId; // Get userId from request body or auth
+    
+    console.log('Save team data request for userId:', userId);
+    console.log('Team data:', teamData);
+    
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        message: "Invalid eventId format",
+      });
+    }
+
+    if (!teamData || !teamData.teamType || !teamData.leaderInfo) {
+      return res.status(400).json({
+        message: "Team data is required with teamType and leaderInfo",
+      });
+    }
+
+    // MANDATORY: Validate subscription for ALL users (leader + team members)
+    const Payment = require("../models/Payment");
+    const User = require("../models/User");
+    
+    // Collect all user IDs that need subscription validation
+    let allUserIds = [userId]; // Start with team leader
+    
+    // Add team members' user IDs if they exist
+    if (teamData.teamMembers && teamData.teamMembers.length > 0) {
+      const memberUserIds = teamData.teamMembers
+        .filter(member => member.xephraId && member.xephraId.trim() !== '')
+        .map(member => member.xephraId.trim());
+      
+      allUserIds = [...allUserIds, ...memberUserIds];
+    }
+    
+    console.log('Validating subscriptions for user IDs:', allUserIds);
+    
+    // Check subscription for each user
+    const subscriptionChecks = await Promise.all(
+      allUserIds.map(async (checkUserId) => {
+        const subscription = await Payment.findOne({
+          'userDetails.userId': checkUserId,
+          'paymentStatus.status': 'verified',
+          'paymentStatus.isActive': true
+        }).sort({ 'paymentStatus.submissionDate': -1 });
+        
+        console.log(`Subscription check for userId ${checkUserId}:`, !!subscription);
+        
+        return {
+          userId: checkUserId,
+          hasActiveSubscription: !!subscription
+        };
+      })
+    );
+    
+    // Find users without active subscriptions
+    const inactiveUsers = subscriptionChecks
+      .filter(check => !check.hasActiveSubscription)
+      .map(check => check.userId);
+    
+    if (inactiveUsers.length > 0) {
+      console.log('Users with inactive subscriptions:', inactiveUsers);
+      
+      // Create team type specific error messages
+      let errorMessage = "";
+      let details = "";
+      
+      // Check if team leader is in inactive list
+      const isLeaderInactive = inactiveUsers.includes(userId);
+      const inactiveMembers = inactiveUsers.filter(id => id !== userId);
+      
+      if (teamData.teamType === 'duo') {
+        if (isLeaderInactive && inactiveMembers.length > 0) {
+          errorMessage = "Both you and your team member don't have active subscriptions.";
+          details = `Team leader (${userId}) and team member (${inactiveMembers[0]}) need to activate their subscriptions.`;
+        } else if (isLeaderInactive) {
+          errorMessage = "Your subscription is not active.";
+          details = `Team leader (${userId}) needs to activate subscription to join events.`;
+        } else {
+          errorMessage = "Your team member doesn't have an active subscription.";
+          details = `Team member (${inactiveMembers[0]}) needs to activate subscription.`;
+        }
+      } else if (teamData.teamType === 'squad') {
+        if (isLeaderInactive) {
+          if (inactiveMembers.length > 0) {
+            errorMessage = `You and ${inactiveMembers.length} team member${inactiveMembers.length > 1 ? 's' : ''} don't have active subscriptions.`;
+            details = `Team leader (${userId}) and members (${inactiveMembers.join(', ')}) need to activate their subscriptions.`;
+          } else {
+            errorMessage = "Your subscription is not active.";
+            details = `Team leader (${userId}) needs to activate subscription to join events.`;
+          }
+        } else {
+          errorMessage = `${inactiveMembers.length} team member${inactiveMembers.length > 1 ? 's' : ''} ${inactiveMembers.length > 1 ? "don't" : "doesn't"} have active subscriptions.`;
+          details = `Following team members need to activate their subscriptions: ${inactiveMembers.join(', ')}`;
+        }
+      } else { // solo
+        errorMessage = "Your subscription is not active.";
+        details = `User ${userId} needs to activate subscription to join events.`;
+      }
+      
+      return res.status(403).json({
+        message: errorMessage,
+        error: "SUBSCRIPTION_REQUIRED",
+        teamType: teamData.teamType,
+        inactiveUsers: inactiveUsers,
+        isLeaderInactive: isLeaderInactive,
+        inactiveMembers: inactiveMembers,
+        details: details
+      });
+    }
+    
+    console.log('All users have active subscriptions, proceeding with team data save');
+
+    // Find the participant first to get their teamDataId
+    const participant = await Participant.findOne({ userId, eventId });
+    
+    if (!participant) {
+      return res.status(404).json({
+        message: "Participant not found. Please join the event first.",
+      });
+    }
+
+    if (!participant.teamData) {
+      return res.status(400).json({
+        message: "No team data record found for this participant.",
+      });
+    }
+
+    // Validate team structure based on type
+    const { teamType, teamMembers } = teamData;
+    
+    if (teamType === 'solo' && teamMembers && teamMembers.length > 0) {
+      return res.status(400).json({
+        message: "Solo teams should not have additional members",
+      });
+    }
+    if (teamType === 'duo' && (!teamMembers || teamMembers.length !== 1)) {
+      return res.status(400).json({
+        message: "Duo teams must have exactly 1 additional member",
+      });
+    }
+    if (teamType === 'squad' && (!teamMembers || teamMembers.length !== 3)) {
+      return res.status(400).json({
+        message: "Squad teams must have exactly 3 additional members",
+      });
+    }
+
+    // Update the existing team data
+    const updatedTeamData = await TeamData.findByIdAndUpdate(
+      participant.teamData,
+      {
+        teamType: teamData.teamType,
+        teamName: teamData.teamName,
+        leaderInfo: teamData.leaderInfo,
+        teamMembers: teamData.teamMembers || []
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTeamData) {
+      return res.status(404).json({
+        message: "Team data not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Team data saved successfully",
+      teamData: updatedTeamData
+    });
+  } catch (error) {
+    console.error('Save team data error:', error);
+    res.status(500).json({
+      message: "Error saving team data",
+      error: error.message
     });
   }
 };

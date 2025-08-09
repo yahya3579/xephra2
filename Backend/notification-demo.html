@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xephra Notification System Demo</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .notification-panel {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .notification {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .notification.unread {
+            border-left-color: #FF9800;
+            background: #3a3a3a;
+        }
+        .notification.high-priority {
+            border-left-color: #F44336;
+        }
+        .notification-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .notification-time {
+            color: #888;
+            font-size: 12px;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .status {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .connected {
+            color: #4CAF50;
+        }
+        .disconnected {
+            color: #F44336;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            background: #444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Xephra Real-Time Notification System Demo</h1>
+        
+        <div class="status">
+            <strong>Connection Status:</strong> <span id="connectionStatus" class="disconnected">Disconnected</span>
+        </div>
+
+        <div class="controls">
+            <h3>Connect as:</h3>
+            <input type="text" id="userId" placeholder="Enter User ID" value="user_123">
+            <select id="userType">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()">Disconnect</button>
+        </div>
+
+        <div class="controls">
+            <h3>Quick Actions:</h3>
+            <button onclick="fetchNotifications()">Fetch Notifications</button>
+            <button onclick="markAllAsRead()">Mark All Read</button>
+            <button onclick="getUnreadCount()">Get Unread Count</button>
+        </div>
+
+        <div class="notification-panel">
+            <h3>📢 Real-Time Notifications</h3>
+            <div id="unreadCount">Unread: 0</div>
+            <div id="notifications">
+                <p>Connect to start receiving notifications...</p>
+            </div>
+        </div>
+
+        <div class="notification-panel">
+            <h3>📋 All Notification Types Supported:</h3>
+            <ul>
+                <li><strong>Subscription Management:</strong>
+                    <ul>
+                        <li>✅ User submits subscription → Admin gets notified</li>
+                        <li>✅ Admin approves/rejects subscription → User gets notified</li>
+                        <li>✅ Admin edits subscription → User gets notified</li>
+                        <li>✅ Subscription expires → User gets notified</li>
+                    </ul>
+                </li>
+                <li><strong>Event Management:</strong>
+                    <ul>
+                        <li>✅ Admin creates event → All users get notified</li>
+                        <li>✅ User registers for event → Admin gets notified</li>
+                        <li>✅ Event completed → All participants get notified</li>
+                    </ul>
+                </li>
+                <li><strong>Game Entry Management:</strong>
+                    <ul>
+                        <li>✅ User submits game entry → Admin gets notified</li>
+                        <li>✅ Admin approves/rejects entry → User gets notified</li>
+                        <li>✅ Admin edits/deletes entry → User gets notified</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let currentUserId = null;
+        let currentUserType = null;
+
+        function connect() {
+            const userId = document.getElementById('userId').value;
+            const userType = document.getElementById('userType').value;
+            
+            if (!userId) {
+                alert('Please enter a User ID');
+                return;
+            }
+
+            currentUserId = userId;
+            currentUserType = userType;
+
+            // Disconnect existing connection
+            if (socket) {
+                socket.disconnect();
+            }
+
+            // Connect to socket with user info
+            socket = io('http://localhost:5000', {
+                query: {
+                    userId: userId,
+                    userType: userType
+                }
+            });
+
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                document.getElementById('connectionStatus').textContent = 'Connected';
+                document.getElementById('connectionStatus').className = 'connected';
+                
+                // Join notification room
+                socket.emit('joinNotificationRoom', { userId, userType });
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                document.getElementById('connectionStatus').textContent = 'Disconnected';
+                document.getElementById('connectionStatus').className = 'disconnected';
+            });
+
+            // Listen for new notifications
+            socket.on('newNotification', (notification) => {
+                console.log('New notification received:', notification);
+                addNotificationToUI(notification);
+                updateUnreadCount();
+            });
+
+            // Listen for notification read status updates
+            socket.on('notificationMarkedRead', (data) => {
+                console.log('Notification marked as read:', data);
+                markNotificationAsReadInUI(data.notificationId);
+            });
+
+            // Listen for admin typing indicators
+            socket.on('adminTypingNotification', (data) => {
+                if (data.isTyping) {
+                    console.log('Admin is typing a notification...');
+                } else {
+                    console.log('Admin stopped typing');
+                }
+            });
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+        }
+
+        function addNotificationToUI(notification) {
+            const notificationsDiv = document.getElementById('notifications');
+            
+            // Create notification element
+            const notificationEl = document.createElement('div');
+            notificationEl.className = `notification ${!notification.isRead ? 'unread' : ''} ${notification.priority === 'high' || notification.priority === 'urgent' ? 'high-priority' : ''}`;
+            notificationEl.id = `notification-${notification._id}`;
+            
+            notificationEl.innerHTML = `
+                <div class="notification-header">${notification.title}</div>
+                <div>${notification.message}</div>
+                <div class="notification-time">
+                    ${new Date(notification.createdAt).toLocaleString()} | 
+                    Priority: ${notification.priority} | 
+                    Type: ${notification.type}
+                    ${!notification.isRead ? ' | <strong>UNREAD</strong>' : ''}
+                </div>
+            `;
+            
+            // Add to top of list
+            if (notificationsDiv.children.length === 0 || notificationsDiv.children[0].tagName === 'P') {
+                notificationsDiv.innerHTML = '';
+            }
+            notificationsDiv.insertBefore(notificationEl, notificationsDiv.firstChild);
+        }
+
+        function markNotificationAsReadInUI(notificationId) {
+            const notificationEl = document.getElementById(`notification-${notificationId}`);
+            if (notificationEl) {
+                notificationEl.classList.remove('unread');
+                // Update the content to remove UNREAD status
+                const timeDiv = notificationEl.querySelector('.notification-time');
+                if (timeDiv) {
+                    timeDiv.innerHTML = timeDiv.innerHTML.replace(' | <strong>UNREAD</strong>', '');
+                }
+            }
+        }
+
+        async function fetchNotifications() {
+            if (!currentUserId) {
+                alert('Please connect first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/notifications?userId=${currentUserId}&userType=${currentUserType}&limit=20`, {
+                    headers: {
+                        'Authorization': 'Bearer YOUR_TOKEN_HERE' // You'll need to implement auth
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    const notificationsDiv = document.getElementById('notifications');
+                    notificationsDiv.innerHTML = '';
+                    
+                    if (data.data.notifications.length === 0) {
+                        notificationsDiv.innerHTML = '<p>No notifications found</p>';
+                    } else {
+                        data.data.notifications.forEach(notification => {
+                            addNotificationToUI(notification);
+                        });
+                    }
+                    
+                    document.getElementById('unreadCount').textContent = `Unread: ${data.data.unreadCount}`;
+                }
+            } catch (error) {
+                console.error('Failed to fetch notifications:', error);
+                alert('Failed to fetch notifications. Make sure the server is running and you have proper authentication.');
+            }
+        }
+
+        async function markAllAsRead() {
+            if (!currentUserId) {
+                alert('Please connect first');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/notifications/mark-all-read', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_TOKEN_HERE' // You'll need to implement auth
+                    },
+                    body: JSON.stringify({
+                        userId: currentUserId,
+                        userType: currentUserType
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Remove unread class from all notifications
+                    document.querySelectorAll('.notification.unread').forEach(el => {
+                        el.classList.remove('unread');
+                        const timeDiv = el.querySelector('.notification-time');
+                        if (timeDiv) {
+                            timeDiv.innerHTML = timeDiv.innerHTML.replace(' | <strong>UNREAD</strong>', '');
+                        }
+                    });
+                    
+                    updateUnreadCount();
+                    alert('All notifications marked as read');
+                }
+            } catch (error) {
+                console.error('Failed to mark all as read:', error);
+                alert('Failed to mark notifications as read');
+            }
+        }
+
+        async function getUnreadCount() {
+            if (!currentUserId) {
+                alert('Please connect first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/notifications/unread-count?userId=${currentUserId}&userType=${currentUserType}`, {
+                    headers: {
+                        'Authorization': 'Bearer YOUR_TOKEN_HERE' // You'll need to implement auth
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('unreadCount').textContent = `Unread: ${data.data.unreadCount}`;
+                }
+            } catch (error) {
+                console.error('Failed to get unread count:', error);
+            }
+        }
+
+        function updateUnreadCount() {
+            const unreadElements = document.querySelectorAll('.notification.unread');
+            document.getElementById('unreadCount').textContent = `Unread: ${unreadElements.length}`;
+        }
+
+        // Auto-connect as demo user on page load
+        window.onload = function() {
+            // You can uncomment this to auto-connect for demo purposes
+            // setTimeout(() => connect(), 1000);
+        };
+    </script>
+</body>
+</html>

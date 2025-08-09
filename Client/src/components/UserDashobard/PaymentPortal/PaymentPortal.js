@@ -24,6 +24,7 @@ import {
 } from "../../../redux/features/paymentSlice";
 import FloatingWhatsAppButton from "../../FloatingWhatsAppButton";
 import SubscriptionPopup from './SubscriptionPopup';
+import toast from 'react-hot-toast';
 
 const UserPaymentPortal = () => {
   const dispatch = useDispatch();
@@ -100,7 +101,7 @@ const UserPaymentPortal = () => {
     if (file) {
       // Validate file size (5MB max)
       if (file.size > 5242880) {
-        alert("File size cannot exceed 5MB");
+        toast.error("File size cannot exceed 5MB");
         return;
       }
 
@@ -112,7 +113,7 @@ const UserPaymentPortal = () => {
         "application/pdf",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert("File type must be JPG, PNG, or PDF");
+        toast.error("File type must be JPG, PNG, or PDF");
         return;
       }
 
@@ -143,29 +144,29 @@ const UserPaymentPortal = () => {
 
     // Comprehensive validation
     if (!selectedPlan || !selectedFile) {
-      alert("Please complete all required fields");
+      toast.error("Please complete all required fields");
       return;
     }
 
     if (!formData.name?.trim()) {
-      alert("Please enter your full name");
+      toast.error("Please enter your full name");
       return;
     }
 
     if (!formData.email?.trim() || !validateEmail(formData.email)) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
 
     if (!formData.phone?.trim() || !validatePhoneNumber(formData.phone)) {
-      alert(
+      toast.error(
         "Please enter a valid Pakistani phone number (e.g., +923001234567 or 03001234567)"
       );
       return;
     }
 
     if (!formData.transactionId?.trim()) {
-      alert(
+      toast.error(
         "Transaction ID is required. If you don't have one, please enter 'PENDING' or contact support."
       );
       return;
@@ -176,7 +177,7 @@ const UserPaymentPortal = () => {
       (plan) => plan.id === selectedPlan
     );
     if (!selectedPlanData) {
-      alert("Invalid plan selected");
+      toast.error("Invalid plan selected");
       return;
     }
 
@@ -227,15 +228,6 @@ const UserPaymentPortal = () => {
     // Append file with the exact field name backend expects
     submitData.append("paymentReceipt", selectedFile);
 
-    // Debug logging
-    console.log("=== PAYMENT SUBMISSION DEBUG ===");
-    console.log("userDetails:", JSON.stringify(userDetails, null, 2));
-    console.log("selectedPlan:", JSON.stringify(planData, null, 2));
-    console.log("paymentDetails:", JSON.stringify(paymentDetails, null, 2));
-    console.log("file name:", selectedFile.name);
-    console.log("file size:", selectedFile.size);
-    console.log("file type:", selectedFile.type);
-
     try {
       await dispatch(submitPayment(submitData)).unwrap();
       // Success handled by Redux state
@@ -248,7 +240,7 @@ const UserPaymentPortal = () => {
   // Show success message
   useEffect(() => {
     if (successMessage) {
-      alert(`${successMessage} You will receive confirmation within 24 hours.`);
+      toast.success(`${successMessage} You will receive confirmation within 24 hours.`);
       dispatch(resetPaymentState());
       setSelectedFile(null);
     }

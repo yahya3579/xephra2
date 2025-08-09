@@ -2,6 +2,7 @@ import { MdEventAvailable, MdSportsEsports } from "react-icons/md";
 import { MdEventNote } from "react-icons/md";
 import { PiRankingBold } from "react-icons/pi";
 import { MdLibraryAddCheck } from "react-icons/md";
+import { IoNotifications } from "react-icons/io5";
 
 export const menuItems = [
   {
@@ -29,6 +30,10 @@ export const menuItems = [
   {
     name: "Ranking Approval",
     key: "rankingApproval",
+  },
+  {
+    name: "Notifications",
+    key: "notifications",
   },
   { 
     name: "Payment Portal", 

@@ -10,9 +10,14 @@ const participantSchema = new mongoose.Schema({
     ref: "Event",
     required: true,
   },
+  teamData: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "TeamData",
+    required: true,
+  },
   registeredAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 });
 

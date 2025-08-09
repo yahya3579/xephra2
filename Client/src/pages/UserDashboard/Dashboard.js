@@ -8,6 +8,7 @@ import UpcomingEvents from "../../components/UserDashobard/UpcomingEvents";
 import RegisteredEvents from "../../components/UserDashobard/RegisteredEvents";
 import RankingBoard from "../../components/UserDashobard/RankingBoard";
 import RankingApproval from "../../components/UserDashobard/RankingApproval";
+import UserNotificationPanel from "../../components/Notifications/UserNotificationPanel";
 import { TbLogout2 } from "react-icons/tb";
 import { logout } from "../../redux/features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -90,7 +91,7 @@ function Sidebar({ onMenuClick, dark }) {
           ))}
         </ul>
         <div className="flex flex-col justify-center items-center pb-10  w-full">
-          <div className="px-6 my-6">
+          <div className="px-6 my-2">
             <Link to={"/userdashboard/chats"}>
               <button
                 className={`flex items-center justify-center w-full px-4 py-2 text-sm font-medium leading-5 transition-colors duration-150 border-2 border-[#C9B796] rounded-lg focus:outline-none focus:shadow-outline-purple ${
@@ -179,6 +180,8 @@ function Dashboard() {
         return <CompletedEvents dark={dark} />;
       case "rankingApproval":
         return <RankingApproval dark={dark} />;
+      case "notifications":
+        return <UserNotificationPanel dark={dark} />;
       case "userProfile":
         return <UserProfile dark={dark} profile={profile} />;
       default:

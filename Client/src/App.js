@@ -1,8 +1,10 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import socketService from "./utils/socket";
+import { Toaster } from 'react-hot-toast';
 
 import Loading from "./utils/Loading/Loading";
 import RegisterEventDetailUser from "./components/UserDashobard/RegisterEventDetailUser";
@@ -50,34 +52,22 @@ const Home = lazy(() => import("./pages/Home"));
 const ChatSystem = lazy(() => import("./components/ChatSystem"));
 
 export default function App() {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated && user?._id) {
+      socketService.connect(user._id);
+    }
+
+    return () => {
+      if (!isAuthenticated) {
+        socketService.disconnect();
+      }
+    };
+  }, [isAuthenticated, user]);
+
   return (
     <BrowserRouter>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=""
-        containerStyle={{}}
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            theme: {
-              primary: '#4aed88',
-            },
-          },
-          error: {
-            duration: 4000,
-            theme: {
-              primary: '#ff4b4b',
-            },
-          },
-        }}
-      />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<HomeV2 />} />
@@ -208,6 +198,16 @@ export default function App() {
           />
         </Routes>
       </Suspense>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
     </BrowserRouter>
   );
 }

@@ -4,6 +4,14 @@ const eventRankingBoard = require("../models/EventRankingBoard");
 const UserEventStats = require("../models/userEventStats");
 const Participant = require("../models/Participant");
 const UserProfile = require("../models/UserProfile");
+const User = require("../models/User");
+const Events = require("../models/Events");
+const { 
+  notifyGameEntrySubmitted,
+  notifyGameEntryApproved,
+  notifyGameEntryRejected,
+  notifyGameEntryDeleted
+} = require("../utils/notificationHelpers");
 
 exports.postRankingApproval = async (req, res) => {
   try {
@@ -32,6 +40,16 @@ exports.postRankingApproval = async (req, res) => {
     });
 
     const savedSubmission = await newSubmission.save();
+
+    // Send notification to admin about new game entry submission
+    try {
+      const userData = await User.findOne({ userId });
+      const eventData = await Events.findById(eventId);
+      await notifyGameEntrySubmitted(savedSubmission, userData, eventData);
+    } catch (notificationError) {
+      console.error('Error sending game entry submitted notification:', notificationError);
+      // Don't fail the main request if notification fails
+    }
 
     res.status(200).json({
       message: "Submission created successfully",
@@ -72,6 +90,16 @@ exports.userApprovalDelete = async (req, res) => {
         message: "no submission found for the given user",
       });
     }
+    
+    // Send notification to user about game entry deletion
+    try {
+      const eventData = await Events.findById(eventId);
+      await notifyGameEntryDeleted(result._id, userId, eventData, "Your submission was removed by admin");
+    } catch (notificationError) {
+      console.error('Error sending game entry deleted notification:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+    
     res.status(200).json({
       message: "Submission deleted successfully",
     });
@@ -156,6 +184,15 @@ exports.assignEventRanking = async (req, res) => {
 
     await submission.save();
 
+    // Send notification to user about game entry approval
+    try {
+      const eventData = await Events.findById(eventId);
+      await notifyGameEntryApproved(submission._id, userId, eventData);
+    } catch (notificationError) {
+      console.error('Error sending game entry approved notification:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+
     res.status(200).json({
       message: "Rank Assigned and Stats Updated Successfully",
       data: event,
@@ -193,6 +230,16 @@ exports.declineRanking = async (req, res) => {
 
     submission.status = "not approved";
     await submission.save();
+    
+    // Send notification to user about game entry rejection
+    try {
+      const eventData = await Events.findById(eventId);
+      await notifyGameEntryRejected(submission._id, userId, eventData, "Your submission did not meet the requirements");
+    } catch (notificationError) {
+      console.error('Error sending game entry rejected notification:', notificationError);
+      // Don't fail the main request if notification fails
+    }
+    
     res.status(200).json({
       message: "not approved",
     });

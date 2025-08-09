@@ -506,6 +506,7 @@
 
 
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const PaymentForm = () => {
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -519,10 +520,10 @@ const PaymentForm = () => {
       (paymentMethod === 'JazzCash' || paymentMethod === 'EasyPaisa') &&
       (!walletNumber || !transactionId)
     ) {
-      alert("Please enter mobile number and transaction ID");
+      toast.error("Please enter mobile number and transaction ID");
       return;
     }
-    alert(`Payment via ${paymentMethod}`);
+    toast.success(`Payment via ${paymentMethod}`);
   };
 
   return (

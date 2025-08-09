@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { IoMoonSharp } from "react-icons/io5";
 import { ImBrightnessContrast } from "react-icons/im";
-import { FiBell } from "react-icons/fi"; // For Notifications Icon
 import { useDispatch, useSelector } from "react-redux";
+import NotificationBell from "../Notifications/NotificationBell";
 
 export default function Header({
   dark,
@@ -14,7 +14,21 @@ export default function Header({
   onMenuClick, 
   profile,
 }) {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  
+  // Debug auth state
+  console.log('Admin Header - Auth state:', { 
+    user: !!user, 
+    userId: user?._id, 
+    isAuthenticated,
+    profileId: profile?.userId || profile?._id,
+    profile: profile 
+  });
 
+  // Use user._id, or profile.userId, or fallback to 'admin'
+  const userId = user?._id || profile?.userId || profile?._id || 'admin';
+  
+  console.log('Admin Header - Computed userId:', userId);
 
   return (
     <header className={`z-10 py-4`}>
@@ -43,13 +57,12 @@ export default function Header({
                )}
              </button>
    
-             {/* Notifications Icon */}
-             <button
-               className="p-1 text-white rounded-full focus:outline-none hover:bg-gray-400 dark:text-gray-300 dark:hover:bg-gray-700"
-               aria-label="Notifications"
-             >
-               <FiBell className="text-[#C9B796]" />
-             </button>
+             {/* Notifications Bell */}
+             <NotificationBell 
+               userId={userId}
+               userType="admin"
+               isAdmin={true}
+             />
    
              {/* Profile Image */}
              <Link>

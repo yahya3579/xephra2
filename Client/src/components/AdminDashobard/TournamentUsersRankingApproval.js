@@ -12,6 +12,7 @@ import { getEventById } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 import { Link, useParams } from "react-router-dom";
 import FullScreenModal from "../../features/FullScreenModal";
+import toast from 'react-hot-toast';
 
 const TournamentUsersRankingApproval = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ const TournamentUsersRankingApproval = () => {
 
   useEffect(() => {
     if (message) {
-      alert(message);
+      toast.success(message);
       dispatch(resetMessage());
     }
   }, [message, dispatch]);

@@ -137,7 +137,6 @@ export const getTopRanking = createAsyncThunk(
       const response = await axios.get(`${apiUrl}/rank/gettopranks`, { withCredentials: true });
       return response.data.mixedData;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(error.response?.data);
     }
   }

@@ -71,16 +71,12 @@ const confirmDelete = async () => {
       setDeleteModalOpen(false);
       setSubscriptionToDelete(null);
       fetchSubscriptions(); // Data refresh karein
-      
-      // Optional: Success message show kar sakte hain
-      console.log('Subscription deleted successfully');
     } else {
-      // Error handle karein
-      console.error('Failed to delete subscription:', result.payload);
+      // Error handle karein - silent failure
     }
     
   } catch (error) {
-    console.error("Failed to delete subscription:", error);
+    // Handle error silently
   } finally {
     setIsDeleting(false);
   }
@@ -90,7 +86,6 @@ const confirmDelete = async () => {
 useEffect(() => {
   if (successMessage && successMessage.includes('deleted')) {
     // Success message show karein (toast ya alert)
-    console.log(successMessage);
     // Agar toast library use kar rahe hain:
     // toast.success(successMessage);
   }
@@ -488,7 +483,6 @@ useEffect(() => {
                             className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
                             title="Delete"
                           >
-                            {console.log(sub.paymentId)}
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

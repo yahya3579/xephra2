@@ -19,6 +19,7 @@ const TournamentCard = (tournament) => {
       <div className="p-4">
       <Link to={`/registereventuser/${event?._id}`}>
         <p className="text-[#C9B796] text-lg font-bold mt-1">{event?.game}</p>
+        <p className="text-[#D4AD66] text-sm font-semibold mb-1">Mode: {event?.gameMode?.charAt(0).toUpperCase() + event?.gameMode?.slice(1)}</p>
         <p className="text-[#C9B796] mt-2  line-clamp-3">{event?.description}</p>
         <p className="bg-[#302A27] text-[#C9B796] font-bold px-2 w-1/2">{event?.date}</p>
         <div className="mt-4 flex justify-between items-center">
@@ -47,8 +48,6 @@ const RegisteredEvents = ({ dark }) => {
   if (loading) {
     return <Loading />;
   }
-
-  
 
   return (
     <div

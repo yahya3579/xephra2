@@ -106,6 +106,9 @@ router.delete(
 // Get user's subscription status
 router.get('/user/:userId/subscription-status', authenticateUser, PaymentController.getSubscriptionStatus);
 
+// Validate team members' subscription status
+router.post('/validate-team-subscriptions', PaymentController.validateTeamSubscriptions);
+
 // =======================
 // ADMIN AUTHENTICATED ROUTES
 // =======================

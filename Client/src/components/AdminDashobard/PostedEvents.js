@@ -104,6 +104,7 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
     _id,
     title,
     game,
+    gameMode,
     date,
     time,
     description,
@@ -128,6 +129,7 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
         <div className="p-4">
           <Link to={`/eventadmin/${_id}`}>         
           <p className="text-[#C9B796] text-lg font-bold mt-1">{game}</p>
+          <p className="text-[#D4AD66] text-sm font-semibold mb-1">Mode: {gameMode?.charAt(0).toUpperCase() + gameMode?.slice(1)}</p>
           <p className="text-sm text-gray-400">
             <span className="bg-[#302A27] font-bold px-2 w-1/2">{date}</span> •<span className="bg-[#302A27] font-bold px-2 w-1/2">{time}</span> 
           </p>
@@ -143,6 +145,7 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
                       _id,
                       title,
                       game,
+                      gameMode,
                       date,
                       time,
                       description,

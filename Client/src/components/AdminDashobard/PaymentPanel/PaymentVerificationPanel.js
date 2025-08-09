@@ -1623,6 +1623,7 @@ import {
 } from "../../../redux/features/paymentSlice";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import toast from 'react-hot-toast';
 
 const PaymentVerificationPanel = () => {
   const dispatch = useDispatch();
@@ -1786,10 +1787,10 @@ const PaymentVerificationPanel = () => {
       dispatch(getAllPayments(queryParams));
 
       // Optional: Show success message
-      alert("Payment approved successfully!");
+      toast.success("Payment approved successfully!");
     } catch (error) {
       console.error("Failed to approve payment:", error);
-      alert("Failed to approve payment: " + (error.message || error));
+      toast.error("Failed to approve payment: " + (error.message || error));
     } finally {
       closeConfirmationModal();
     }
@@ -1799,7 +1800,7 @@ const PaymentVerificationPanel = () => {
   const handleConfirmedReject = async () => {
     // Validation: Reject reason is required
     if (!rejectReason.trim()) {
-      alert("Please provide a reason for rejection");
+      toast.error("Please provide a reason for rejection");
       return;
     }
 
@@ -1819,10 +1820,10 @@ const PaymentVerificationPanel = () => {
       };
       dispatch(getAllPayments(queryParams));
 
-      alert("Payment rejected successfully!");
+      toast.success("Payment rejected successfully!");
     } catch (error) {
       console.error("Failed to reject payment:", error);
-      alert("Failed to reject payment: " + (error.message || error));
+      toast.error("Failed to reject payment: " + (error.message || error));
     } finally {
       closeConfirmationModal();
     }
@@ -1886,10 +1887,10 @@ const PaymentVerificationPanel = () => {
       dispatch(getAllPayments(queryParams));
 
       // Optional: Show success message
-      alert("Payment updated successfully!");
+      toast.success("Payment updated successfully!");
     } catch (error) {
       console.error("Failed to update payment:", error);
-      alert("Failed to update payment: " + (error.message || error));
+      toast.error("Failed to update payment: " + (error.message || error));
     }
   };
 
@@ -1898,7 +1899,7 @@ const PaymentVerificationPanel = () => {
       const fileUrl = `${process.env.REACT_APP_BACKEND}/uploads/receipts/${payment.paymentReceipt.fileName}`;
       setViewingReceipt(fileUrl);
     } else {
-      alert("No receipt uploaded for this payment.");
+      toast.error("No receipt uploaded for this payment.");
     }
   };
 
@@ -1955,17 +1956,13 @@ const PaymentVerificationPanel = () => {
   ];
 
   const paymentMethods = [
-    { value: "hbl", label: "HBL Bank Transfer" },
-    { value: "ubl", label: "UBL Bank Transfer" },
-    { value: "mcb", label: "MCB Bank Transfer" },
-    { value: "jazzcash", label: "JazzCash" },
-    { value: "easypaisa", label: "Easypaisa" },
+    { value: "askari", label: "Askari Bank Limited" },
   ];
 
   const plans = [
-    { value: "weekly", label: "Weekly Plan - PKR 350" },
-    { value: "monthly", label: "Monthly Plan - PKR 999" },
-    { value: "yearly", label: "Yearly Plan - PKR 8,999" },
+    { value: "weekly", label: "Weekly Plan - PKR 749" },
+    { value: "monthly", label: "Monthly Plan - PKR 1,499" },
+    { value: "quarterly", label: "Quarterly Plan - PKR 3,999" },
   ];
 
   return (
@@ -2749,7 +2746,8 @@ const PaymentVerificationPanel = () => {
                             e.target.value
                           )
                         }
-                        className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:border-fuchsia-400"
+                        disabled={true}
+                        className="w-full px-3 py-2 bg-gray-500 border border-gray-500 rounded-md text-gray-300 cursor-not-allowed opacity-60"
                       >
                         <option value="">Select Payment Method</option>
                         {paymentMethods.map((method) => (
@@ -2758,6 +2756,9 @@ const PaymentVerificationPanel = () => {
                           </option>
                         ))}
                       </select>
+                      <div className="text-xs text-gray-400 mt-1">
+                        💡 Payment method cannot be changed (Only Askari Bank Limited is supported)
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">

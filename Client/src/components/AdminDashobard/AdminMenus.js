@@ -31,6 +31,10 @@ export const menuItems = [
     key: "rankingApproval",
   },
   {
+    name: "Notifications",
+    key: "notifications",
+  },
+  {
     name: "Payment Panel",
     key: "PaymentPanel",
   },

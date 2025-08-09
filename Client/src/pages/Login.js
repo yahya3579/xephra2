@@ -8,6 +8,7 @@ import { LoginUser, resendVerificationEmail } from "../redux/features/authSlice"
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../utils/Loading/Loading";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const { loading, error, token, message } = useSelector((state) => state.auth);
@@ -46,7 +47,7 @@ const Login = () => {
 
   const handleResendVerification = async () => {
     if (!formData.email) {
-      alert("Please enter your email address first");
+      toast.error("Please enter your email address first");
       return;
     }
     
@@ -54,7 +55,7 @@ const Login = () => {
     dispatch(resendVerificationEmail(formData.email)).then((action) => {
       setResendLoading(false);
       if (resendVerificationEmail.fulfilled.match(action)) {
-        alert("Verification email sent successfully! Please check your inbox.");
+        toast.success("Verification email sent successfully! Please check your inbox.");
       }
     });
   };

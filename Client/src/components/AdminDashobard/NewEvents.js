@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
-import toast from "react-hot-toast";
 
 const NewEvents = ({ setActiveMenu, dark }) => {
   const dispatch = useDispatch();
-  const { loading, error, message } = useSelector((state) => state.events);
+  const { loading, error } = useSelector((state) => state.events);
   const [formData, setFormData] = useState({
     title: "",
     game: "",
+    gameMode: "",
     date: "",
     time: "",
     description: "",
@@ -34,21 +34,13 @@ const NewEvents = ({ setActiveMenu, dark }) => {
     });
   };
 
-  // Handle success and error messages
-  useEffect(() => {
-    if (message && !loading) {
-      toast.success(message);
-    }
-    if (error && !loading) {
-      toast.error(error);
-    }
-  }, [message, error, loading]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("title", formData.title);
     formDataToSubmit.append("game", formData.game);
+    formDataToSubmit.append("gameMode", formData.gameMode);
     formDataToSubmit.append("date", formData.date);
     formDataToSubmit.append("time", formData.time);
     formDataToSubmit.append("description", formData.description);
@@ -65,26 +57,17 @@ const NewEvents = ({ setActiveMenu, dark }) => {
         formDataToSubmit.append("adminId", adminId);
     }
 
-    const loadingToast = toast.loading("Creating event...");
-    
-    dispatch(createEvent(formDataToSubmit)).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success("Event created successfully!");
-        setFormData({
-          title: "",
-          game: "",
-          date: "",
-          time: "",
-          description: "",
-          image: null,
-          prizePool: "",
-          rules: "",
-        });
-        // Optionally redirect to posted events
-        // setActiveMenu("postedEvents");
-      }
-      // Error will be handled by useEffect above
+    dispatch(createEvent(formDataToSubmit));
+    setFormData({
+      title: "",
+      game: "",
+      gameMode: "",
+      date: "",
+      time: "",
+      description: "",
+      image: null,
+      prizePool: "",
+      rules: "",
     });
   };
   if (loading) {
@@ -126,6 +109,26 @@ const NewEvents = ({ setActiveMenu, dark }) => {
               className="p-2 rounded-md bg-[#00000082] text-white"
               required
             />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-[#D4AD66] ml-1 pb-2">Game Mode</label>
+            <select
+              name="gameMode"
+              value={formData.gameMode}
+              onChange={handleChange}
+              className="p-2 rounded-md bg-[#00000082] text-white"
+              style={{
+                backgroundColor: '#00000082',
+                color: 'white'
+              }}
+              required
+            >
+              <option value="" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Select Game Mode</option>
+              <option value="solo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Solo</option>
+              <option value="duo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Duo</option>
+              <option value="squad" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Squad</option>
+            </select>
           </div>
         </div>
 
@@ -213,6 +216,7 @@ const NewEvents = ({ setActiveMenu, dark }) => {
             Create Event
           </button>
         </div>
+        {error && <p className="text-red-500">{error?.error}</p>}
       </form>
     </div>
   );

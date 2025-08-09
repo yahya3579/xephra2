@@ -86,7 +86,23 @@ export const joinEvent = createAsyncThunk(
       }, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.log("error",error);
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+// Save team data thunk
+export const saveTeamData = createAsyncThunk(
+  "events/saveTeamData",
+  async ({ userId, eventId, teamData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${apiUrl}/user/save-team-data`, {
+        userId,
+        eventId,
+        teamData,
+      }, { withCredentials: true });
+      return response.data;
+    } catch (error) {
       return rejectWithValue(error.response?.data);
     }
   }
@@ -146,14 +162,23 @@ const eventsSlice = createSlice({
   initialState: {
     event: null,
     events: [],
+    registeredEvents: [],
     participants: [],
     hostEvent: null,
     hostedEvents: [],
+    teamData: null,
     message: "",
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearMessage: (state) => {
+      state.message = "";
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createEvent.pending, (state) => {
@@ -233,6 +258,19 @@ const eventsSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || action.error.message;
       })
+      .addCase(saveTeamData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(saveTeamData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.teamData = action.payload.teamData;
+        state.message = action.payload.message;
+      })
+      .addCase(saveTeamData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || action.error.message;
+      })
       .addCase(getEventsByUserId.pending, (state) => {
         state.loading = true;
       })
@@ -269,6 +307,7 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchHostedTournaments.pending, (state) => {
         state.loading = true;
+        state.error = null; // Clear any previous errors
       })
       .addCase(fetchHostedTournaments.fulfilled, (state, action) => {
         state.loading = false;
@@ -281,4 +320,5 @@ const eventsSlice = createSlice({
   },
 });
 
+export const { clearError, clearMessage } = eventsSlice.actions;
 export default eventsSlice.reducer;

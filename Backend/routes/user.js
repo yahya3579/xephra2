@@ -10,6 +10,8 @@ const {
   getUser,
   upcomingEvents,
   joinEvent,
+  getTeamData,
+  updateTeamData,
   getEvents,
   getHostedEvents,
   getProfileExisting,
@@ -21,8 +23,8 @@ const {
   getAdminUserSingleChats,
   getGroupsForAdmin,
   postuploadedfileinchat,
-  getuserBadge
-
+  getuserBadge,
+  saveTeamData
 } = require("../controllers/user");
 const upload = require("../config/multerConfig");
 
@@ -37,6 +39,9 @@ router.patch("/usersuspend/:userId", suspendUser);
 router.get("/upcomingevents", upcomingEvents);
 
 router.post("/event-join", joinEvent);
+router.post("/save-team-data", saveTeamData);
+router.get("/team-data/:userId/:eventId", getTeamData);
+router.put("/team-data/:teamDataId", updateTeamData);
 router.get("/user-chat-groups", getUserChatGroups);
 
 router.post("/registered-events", getEvents);

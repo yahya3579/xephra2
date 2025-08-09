@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHostedTournaments } from "../../redux/features/eventsSlice";
+import { fetchHostedTournaments, clearError } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 
 const CompletedEvents = ({ dark }) => {
@@ -9,6 +9,8 @@ const CompletedEvents = ({ dark }) => {
   const { hostedEvents, loading, error } = useSelector((state) => state.events);
 
   useEffect(() => {
+    // Clear any previous errors when component mounts
+    dispatch(clearError());
     dispatch(fetchHostedTournaments());
   }, [dispatch]);
 
@@ -20,6 +22,7 @@ const CompletedEvents = ({ dark }) => {
     _id,
     title,
     game,
+    gameMode,
     date,
     time,
     description,
@@ -41,6 +44,7 @@ const CompletedEvents = ({ dark }) => {
         <div className="p-4">
           <Link to={`/userdashboard/eventdetailuser/${_id}`}>
           <p className="text-[#C9B796] text-lg font-bold mt-1">{game}</p>
+          <p className="text-[#D4AD66] text-sm font-semibold mb-1">Mode: {gameMode?.charAt(0).toUpperCase() + gameMode?.slice(1)}</p>
            <p className="text-[#C9B796] mt-2  line-clamp-3">{description}</p>
            <p className="text-lg text-[#C9B796] lg:w-[100%] mt-2">
            <span className=" bg-[#302A27] px-5">{date}</span> • <span className=" bg-[#302A27] px-5">{time}</span>
